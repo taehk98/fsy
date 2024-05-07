@@ -37,11 +37,11 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className='navbar'>
+      <nav className='navbar flex-items' >
         <Link to='/' className='flex-none w-20'>
           <img src={logo} className='w-full' />
         </Link>
-        <h4 className='font-bold text-red text-2xl'>FSY 전국 청소년 활동의 날</h4>
+        
         
 
         <div className='flex items-center gap-3 md:gap-6 ml-auto'>
@@ -66,10 +66,6 @@ const Navbar = () => {
             <>
               <Link to='/signin' className='btn-dark py-2'>
                 Sign In
-              </Link>
-
-              <Link to='/signup' className='btn-light py-2 hidden md:block'>
-                Sign Up
               </Link>
             </>
           )}
