@@ -1,18 +1,17 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const uuid = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const DB = require('./database.js');
 const cors = require('cors');
 const axios = require("axios");
 const path = require("path");
-const apiKey = require('./apiKey.json'); // 여기에 API 인증 키를 넣어주세요
-const { peerProxy } = require('./peerProxy.js');
+// const { peerProxy } = require('./peerProxy.js');
 const app = express();
 
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 const authCookieName = 'token';
-let attendances = [];
+let scores = [];
 
 
 app.use(express.json());
@@ -34,43 +33,30 @@ app.use(function (err, req, res, next) {
     res.status(500).send({ type: err.name, message: err.message });
   });
 
-app.get('/soccer-results', async (req, res) => {
-    try {
-        const response = await axios.get('https://api.football-data.org/v4/competitions/PL/matches', {
-            headers: {
-                'X-Auth-Token': apiKey.key
-            }
-        });
-        res.json(response.data);
-    } catch (error) {
-        console.error('Error fetching soccer results:', error);
-        res.status(500).json({ error: 'Failed to fetch soccer results' });
-    }
-});
-
 //http://api.football-data.org/v4/competitions/PL/standings 프리미어리그 순서 가져오는 api endpoint
 
-apiRouter.post('/auth/create', async (req, res) => {
-    if (await DB.getUser(req.body.email)) {
-      res.status(409).send({ msg: 'Existing user' });
-    } else {
-        attendances = await DB.initialClubAttds(req.body.club, attendances);
-        const user = await DB.createUser(req.body.email, req.body.password, req.body.name, req.body.club);
-        attendances = await addUserToAttds(req.body.email, attendances);
-        // Set the cookie
-        setAuthCookie(res, user.token);
+// apiRouter.post('/auth/create', async (req, res) => {
+//     if (await DB.getUser(req.body.email)) {
+//       res.status(409).send({ msg: 'Existing user' });
+//     } else {
+//         attendances = await DB.initialClubAttds(req.body.club, attendances);
+//         const user = await DB.createUser(req.body.email, req.body.password, req.body.name, req.body.club);
+//         attendances = await addUserToAttds(req.body.email, attendances);
+//         // Set the cookie
+//         setAuthCookie(res, user.token);
   
-        res.send({ name: req.body.name, club: req.body.club });
-    }
-});
+//         res.send({ name: req.body.name, club: req.body.club });
+//     }
+// });
 
 apiRouter.post('/auth/login', async (req, res) => {
-const user = await DB.getAttendance(req.body.email);
+const user = await DB.getAdmin(req.body.id);
 if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
     setAuthCookie(res, user.token);
-    attendances = await DB.initialClubAttds(user.club, attendances);
-    res.send({ name: user.name, club: user.club });
+    scores = await DB.initialScores(scores);
+    const accessToken = uuidv4();
+    res.send({ scores: scores, accessToken: accessToken });
     // 호출 시 외부의 attendances 변수를 업데이트함
     return;
     }
@@ -131,7 +117,7 @@ const httpService = app.listen(port, () => {
     console.log(`Listening on port ${port}`);
   });
 
-peerProxy(httpService);
+// peerProxy(httpService);
 
 async function addUserToAttds(email, attendances) {
     const attd = await DB.getAttendance(email);
