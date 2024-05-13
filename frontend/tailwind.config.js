@@ -13,6 +13,8 @@ export default {
         transparent: 'transparent',
         twitter: '#1DA1F2',
         purple: '#8B46FF',
+        bgColor: '#FAFCFF'
+        // 더연한거 FAFCFF / #F5F8FC
       },
       fontSize: {
         sm: '12px',

@@ -3,14 +3,21 @@ import logo from '../assets/fsy_logo.png';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { UserContext } from '../App';
 import UserNavigationPanel from './user-navigation.component';
+import { removeFromSession } from '../common/session';
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   
   const {
-    userAuth,
-    userAuth: { access_token, profile_img },
+    userAuth: { access_token },
+    setUserAuth,
   } = useContext(UserContext);
+
+
+  const signOutUser = () => {
+    removeFromSession('user');
+    setUserAuth({ access_token: null });
+  };
 
   const [userNavPanel, setUserNavPanel] = useState(false);
 
@@ -37,35 +44,26 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className='navbar flex-items' >
+      <nav className='navbar flex-items bg-bgColor' >
         <Link to='/' className='flex-none w-20'>
-          <img src={logo} className='w-full' />
+          <img src={logo} className='w-full rounded-full' />
         </Link>
-        
-        
 
         <div className='flex items-center gap-3 md:gap-6 ml-auto'>
 
           {access_token ? (
             <>
-              <div
-                className='relative'
-                onClick={handleUserNavPanel}
-                onBlur={handleBlur}
+              <button
+                className='text-left p-4 hover:bg-grey w-full pl-8 py-4'
+                onClick={signOutUser}
               >
-                <button className='w-12 h-12 mt-1'>
-                  <img
-                    src={profile_img}
-                    className='w-12 h-full object-cover rounded-full'
-                  />
-                </button>
-                {userNavPanel ? <UserNavigationPanel /> : ''}
-              </div>
-            </>
+                <h1 className='font-bold text-xl mg-1'>로그아웃</h1>
+            </button>
+          </>
           ) : (
             <>
               <Link to='/signin' className='btn-dark py-2'>
-                Sign In
+                로그인
               </Link>
             </>
           )}

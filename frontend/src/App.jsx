@@ -7,6 +7,7 @@ import { lookInSession } from './common/session';
 import HomePage from './pages/home.page';
 import PageNotFound from './pages/404.page';
 import Navbar from './components/navbar.component';
+import {Unauthenticated} from './login/unauthenticated.jsx';
 
 export const UserContext = createContext({});
 
@@ -25,37 +26,23 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <UserContext.Provider value={{ userAuth, setUserAuth }}>
+    <UserContext.Provider value={{ userAuth, setUserAuth }}>
         <Routes>
           <Route path='/' element={<Navbar />}>
             <Route index element={<HomePage />} />
+            <Route path='/signin' element={<Unauthenticated />} />
             <Route path='*' element={<PageNotFound />} />
           </Route>
         </Routes>
-      </UserContext.Provider>
-    </Router>
-    // {/* <div>
-    //   <a href="https://vitejs.dev" target="_blank">
-    //     <img src={viteLogo} className="logo" alt="Vite logo" />
-    //   </a>
-    //   <a href="https://react.dev" target="_blank">
-    //     <img src={reactLogo} className="logo react" alt="React logo" />
-    //   </a>
-    // </div>
-    // <h1>Vite + React</h1>
-    // <div className="card">
-    //   <button onClick={() => setCount((count) => count + 1)}>
-    //     count is {count}
-    //   </button>
-    //   <p>
-    //     Edit <code>src/App.jsx</code> and save to test HMR
-    //   </p>
-    // </div> */}
-    // {/* <p className="read-the-docs">
-    //   Click on the Vite and React logos to learn more
-    // </p> */}
-
+        <footer>
+          <hr className="my-2 border-t border-gray-400" />
+            <h4 className='pt-5 font-bold text-indigo text-xl'>
+              <span>* 점수를 기입하려면</span><br />
+              <span>로그인을 해주세요.</span>
+            </h4>
+        </footer>
+    </UserContext.Provider>
+    
   )
 }
 
