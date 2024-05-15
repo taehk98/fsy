@@ -58,7 +58,11 @@
   }
 
   .btn-light {
-    @apply btn-dark bg-grey text-black;
+    @apply btn-dark bg-grey text-white;
+  }
+
+  .btn-pink {
+    @apply btn-dark bg-buttonPink text-white;
   }
 
   .input-box {

@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 const HomePage = () => {
   return (
     <AnimationWrapper>
-      <section className='flex flex-col items-center justify-center' >
-        <div className='flex mt-5 lg:mt-10'>
+      <section className='flex flex-col items-center justify-center pt-10 mt-6' >
+        <div className='flex pt-10 mt-6 lg:mt-10'>
           <img src={shorts} width={100} height={100} className='w-full h-full md:w-96 md:h-96 rounded-xl' alt='banner' />
         </div>
     

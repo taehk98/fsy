@@ -6,7 +6,7 @@ import { removeFromSession } from '../common/session';
 
 const UserNavigationPanel = () => {
   const {
-    userAuth: { username },
+    userAuth: { access_token },
     setUserAuth,
   } = useContext(UserContext);
 
@@ -14,28 +14,38 @@ const UserNavigationPanel = () => {
     removeFromSession('user');
     setUserAuth({ access_token: null });
   };
+  
+  // <Link to={`/user/${username}`} className='link pl-8 py-4'>
+          //   Profile
+          // </Link>
+
+        //   <button
+        //   className='text-left p-4 hover:bg-grey w-full pl-8 py-4'
+        //   onClick={signOutUser}
+        // >
+        //   <h1 className='font-bold text-xl mg-1'>Sign Out</h1>
+        //   <p className='text-dark-grey'>@{username}</p>
+        // </button>
 
   return (
-    <AnimationWrapper
+    access_token && <AnimationWrapper
       transition={{ duration: 0.2 }}
-      className='absolute right-0 z-50'
+      className='absolute left-0 z-50'
     >
-      <div className='absolute right-0 border border-grey w-60 overflow-hidden duration-200'>
-        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4'>
-          <p>Write</p>
+      <div className='bg-white absolute mt-5 left-0 border border-grey w-60 overflow-hidden duration-200'>
+        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4 text-black'>
+          <p>조 관리</p>
         </Link>
-        <Link to={`/user/${username}`} className='link pl-8 py-4'>
+        {/* <Link to={`/user/${username}`} className='link pl-8 py-4'>
           Profile
+        </Link> */}
+        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4 text-black'>
+          <p>활동 관리</p>
+        </Link>
+        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4 text-black'>
+          <p>점수 현황</p>
         </Link>
         <span className='absolute border-t border-grey w-[100%]'></span>
-
-        <button
-          className='text-left p-4 hover:bg-grey w-full pl-8 py-4'
-          onClick={signOutUser}
-        >
-          <h1 className='font-bold text-xl mg-1'>Sign Out</h1>
-          <p className='text-dark-grey'>@{username}</p>
-        </button>
       </div>
     </AnimationWrapper>
   );

@@ -13,7 +13,13 @@ export default {
         transparent: 'transparent',
         twitter: '#1DA1F2',
         purple: '#8B46FF',
-        bgColor: '#FAFCFF'
+        bgColor: '#FAFCFF',
+        buttonPink: '#EE99C2',
+        beige: '#F6F5F5',
+        navy: '#B4D4FF',
+        green: '#618264',
+        ppink: '#D982BA',
+        bblue: '#2594D9'
         // 더연한거 FAFCFF / #F5F8FC
       },
       fontSize: {

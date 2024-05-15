@@ -4,9 +4,16 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { UserContext } from '../App';
 import UserNavigationPanel from './user-navigation.component';
 import { removeFromSession } from '../common/session';
+import { Toaster, toast } from 'react-hot-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBars } from '@fortawesome/free-solid-svg-icons'
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
+  const [userNavPanel, setUserNavPanel] = useState(false);
+  
+
+  let navigate = useNavigate();
   
   const {
     userAuth: { access_token },
@@ -17,11 +24,16 @@ const Navbar = () => {
   const signOutUser = () => {
     removeFromSession('user');
     setUserAuth({ access_token: null });
+    toast.success('로그아웃 되었습니다.', {
+      duration: 1000 // 5초 동안 표시
+    });
+    // 홈페이지로 리디렉션
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1000);
   };
 
-  const [userNavPanel, setUserNavPanel] = useState(false);
-
-  let navigate = useNavigate();
+  
   
   const handleUserNavPanel = () => {
     setUserNavPanel((currentVal) => !currentVal);
@@ -40,36 +52,43 @@ const Navbar = () => {
       setUserNavPanel(false);
     }, 200);
   };
-
-
   return (
     <>
       <nav className='navbar flex-items bg-bgColor' >
-        <Link to='/' className='flex-none w-20'>
-          <img src={logo} className='w-full rounded-full' />
-        </Link>
-
-        <div className='flex items-center gap-3 md:gap-6 ml-auto'>
-
-          {access_token ? (
+      {access_token ? (
             <>
+              <div
+                className='relative'
+                onClick={handleUserNavPanel}
+                onBlur={handleBlur}
+              >
+                <button className='w-12 h-12 mt-1'>
+                  <FontAwesomeIcon icon={faBars } size="3x" />
+                </button>
+                {userNavPanel ? <UserNavigationPanel /> : ''}
+              </div>
+              
+              <div className='flex items-center gap-3 md:gap-6 ml-auto'></div>
               <button
-                className='text-left p-4 hover:bg-grey w-full pl-8 py-4'
+                className='btn-dark text-left p-4 hover:bg-grey  py-4'
                 onClick={signOutUser}
               >
-                <h1 className='font-bold text-xl mg-1'>로그아웃</h1>
+                <h1 className='font-bold text-base mg-1'>로그아웃</h1>
             </button>
-          </>
-          ) : (
-            <>
-              <Link to='/signin' className='btn-dark py-2'>
-                로그인
-              </Link>
             </>
-          )}
-        </div>
+          ) : (
+          <>
+            <Link to='/' className='flex-none w-20'>
+              <img src={logo} className='w-full rounded-full' />
+            </Link>
+            <div className='flex items-center gap-3 md:gap-6 ml-auto'></div>
+            <Link to='/signin' className='btn-dark py-2'>
+                로그인
+            </Link>
+          </>
+        )}
       </nav>
-
+      <Toaster />
       <Outlet />
     </>
   );

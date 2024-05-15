@@ -1,15 +1,34 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import AnimationWrapper from '../common/page-animation';
 import './unauthenticated.css';
+import InputBox from '../components/input.component';
+import { Link, Navigate } from 'react-router-dom';
+import { Toaster, toast } from 'react-hot-toast';
 // import Button from 'react-bootstrap/Button';
 import {MessageDialog} from './messageDialog';
+import { storeInSession } from '../common/session';
+import { UserContext } from '../App';
 
 export function Unauthenticated(props) {
-  const [id, setID] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  let {
+    userAuth: { access_token },
+    setUserAuth,
+  } = useContext(UserContext);
+
+  // const [id, setID] = React.useState('');
+  // const [password, setPassword] = React.useState('');
   const [displayError, setDisplayError] = React.useState(null);
 
-  async function loginUser() {
-    loginOrCreate(`/api/auth/login`);
+  async function loginUser(e)  {
+    e.preventDefault();
+    // formData
+    let form = new FormData(formElement);
+    let formData = {};
+
+    for (let [key, value] of form.entries()) {
+      formData[key] = value;
+    }
+    loginOrCreate(`/api/auth/login`, formData);
   }
 
   // async function createUser() {
@@ -19,52 +38,53 @@ export function Unauthenticated(props) {
   //   loginOrCreate(`/api/auth/create`);
   // }
 
-  async function loginOrCreate(endpoint) {
-    const response = await fetch(endpoint, {
+  async function loginOrCreate(endpoint, formData) {
+    const SERVER_DOMAIN = 'http://localhost:3000';
+    const response = await fetch(SERVER_DOMAIN + endpoint, {
       method: 'post',
-      body: JSON.stringify({id: id, password: password}),
+      body: JSON.stringify(formData),
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
       },
     });
     if (response?.status === 200) {
         const scoresAndToken = await response.json();
-        console.log(scoresAndToken);
         storeInSession('user', JSON.stringify(scoresAndToken));
         setUserAuth(scoresAndToken);
-        // window.dispatchEvent(new Event('storage'));
-        // props.onLogin(userEmail);
+        window.location.href = '/teams';
     } else {
-      const body = await response.json();
-      setDisplayError(`⚠ Error: ${body.msg}`);
+      // const body = await response.json();
+      toast.error(`로그인 실패: 아이디 또는 비밀번호를 \n다시 확인해주세요.`);
     }
   }
 
-  return (
+  return access_token ? (
+    <Navigate to='/' />
+  ) : (
     <>
-      <div>
-        <div className='form-group'>
-          <input
-            className='form-control'
-            type='text'
-            value={id}
-            onChange={(e) => setID(e.target.value)}
+      <div className='h-cover flex flex-col items-center justify-center'>
+      <Toaster/>
+        <form id='formElement' className='w-[80%] max-w-[400px]'>
+          <InputBox
+            name='id'
+            type='id'
             placeholder='아이디를 입력하세요.'
+            icon='fi-rr-envelope'
           />
-        </div>
-        <div className='form-group'>
-          <input
-            className='form-control'
+          <InputBox
+            name='password'
             type='password'
-            onChange={(e) => setPassword(e.target.value)}
             placeholder='비밀번호를 입력하세요.'
+            icon='fi-rr-key'
           />
-        </div>
-        <div className="login-button">
-            <button type="login" className='btn btn-primary' variant="primary" onClick={() => loginUser()}>
+          <button
+              className='btn-pink center mt-14'
+              type='submit'
+              onClick={loginUser}
+            >
             로그인
-            </button>
-        </div>
+          </button>
+        </form>
       </div>
       <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />
     </>
