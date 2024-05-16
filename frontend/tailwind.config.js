@@ -19,7 +19,8 @@ export default {
         navy: '#B4D4FF',
         green: '#618264',
         ppink: '#D982BA',
-        bblue: '#2594D9'
+        bblue: '#2594D9',
+        lightpink: '#FFE6E6'
         // 더연한거 FAFCFF / #F5F8FC
       },
       fontSize: {

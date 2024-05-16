@@ -32,17 +32,14 @@ const UserNavigationPanel = () => {
       transition={{ duration: 0.2 }}
       className='absolute left-0 z-50'
     >
-      <div className='bg-white absolute mt-5 left-0 border border-grey w-60 overflow-hidden duration-200'>
-        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4 text-black'>
+      <div className='bg-white absolute mt-3 left-0 border border-grey w-60 overflow-hidden duration-200'>
+        <Link to='/editor' className='flex gap-2 link  pl-8 py-4 text-black'>
           <p>조 관리</p>
         </Link>
-        {/* <Link to={`/user/${username}`} className='link pl-8 py-4'>
-          Profile
-        </Link> */}
-        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4 text-black'>
+        <Link to='/editor' className='flex gap-2 link pl-8 py-4 text-black'>
           <p>활동 관리</p>
         </Link>
-        <Link to='/editor' className='flex gap-2 link md:hidden pl-8 py-4 text-black'>
+        <Link to='/editor' className='flex gap-2 link pl-8 py-4 text-black'>
           <p>점수 현황</p>
         </Link>
         <span className='absolute border-t border-grey w-[100%]'></span>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -16,30 +16,73 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export function CollapsibleTable() {
 
-function createData(name, calories, fat, carbs, price) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    price,
-    history: [
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
-    ],
-  };
-}
+    const totalNum = 30;
+
+    const [rows, setRows] = React.useState([
+        createData(2, 1, 6.0, 24, 4.0),
+        createData(1, 2, 9.0, 37, 4.3),
+        createData(3, 3, 16.0, 24, 6.0),
+        createData(4, 4, 3.7, 67, 4.3),
+        createData(5, 5, 16.0, 49, 3.9),
+      ]);
+
+    const [sortByTotalScore, setSortByTotalScore] = React.useState(null);
+    const [sortByParticipateNum, setSortByParticipateNum] = React.useState(null);
+    const [rankingOrder, setRankingOrder] = React.useState(null);
+
+    const handleSortByTotalScore = () => {
+        const sortedRows = [...rows].sort((a, b) => b.totalScore - a.totalScore);
+        setRows(sortByTotalScore ? sortedRows.reverse() : sortedRows);
+        setSortByTotalScore(!sortByTotalScore);
+        setSortByParticipateNum(null);
+        if(sortByTotalScore) {
+            setRankingOrder(true);
+        } else {
+            setRankingOrder(false);
+        }
+    };
+
+    const handleSortByParticipateNum = () => {
+        const sortedRows = [...rows].sort((a, b) => (b.participateNum / totalNum) - (a.participateNum / totalNum));
+        setRows(sortByParticipateNum ? sortedRows.reverse() : sortedRows);
+        setSortByParticipateNum(!sortByParticipateNum);
+        setSortByTotalScore(null);
+        if(sortByParticipateNum) {
+            setRankingOrder(true);
+        } else {
+            setRankingOrder(false);
+        }
+    };
+
+    useEffect(() => {
+        // Call sorting function when the component mounts
+        handleSortByTotalScore();
+    }, []);
+
+    function createData(rank, teamNumber, participateNum, totalScore, price) {
+    return {
+        rank,
+        teamNumber,
+        participateNum,
+        totalScore,
+        price,
+        history: [
+        {
+            date: '2020-01-05',
+            customerId: '11091700',
+            amount: 3,
+        },
+        {
+            date: '2020-01-02',
+            customerId: 'Anonymous',
+            amount: 1,
+        },
+        ],
+    };
+    }
 
 function Row(props) {
-  const { row, index } = props;
+  const { row, index, length } = props;
   const [open, setOpen] = React.useState(false);
   return (
     <React.Fragment>
@@ -49,46 +92,47 @@ function Row(props) {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)} 
-            
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row" >
-          {row.name}
+        <TableCell component="th" scope="row" align="center" >
+            {rankingOrder ? (rows.length - index) : (index + 1) }등
         </TableCell>
-        <TableCell align="right" >{row.calories}</TableCell>
-        <TableCell align="right" >{row.fat}</TableCell>
-        <TableCell align="right" >{row.carbs}</TableCell>
+        <TableCell align="center" >{row.teamNumber}조</TableCell>
+        <TableCell align="center" >{row.participateNum} / {totalNum}</TableCell>
+        <TableCell align="center" >{row.totalScore}점</TableCell>
       </TableRow>
       <TableRow style={{ backgroundColor: index % 2 !== 0 ? '#FFEFEF' : 'transparent' }}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 0 }}>
               <Typography variant="h6" gutterBottom component="div">
-                활동별 점수
+                참여율
               </Typography>
-              <div className="progress">
-                <div className="progress-bar" role="progressbar" style={{width: '25%'}} aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+              <div className="progress mb-1" style={{ backgroundColor: index % 2 !== 0 ? 'white' : 'light-gray' }}>
+                <div className="progress-bar font-bold" role="progressbar" style={{ width: `${(row.participateNum / totalNum) * 100}%` }} aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                    {((row.participateNum / totalNum) * 100).toFixed(1)}%
+                </div>
                 </div>
               <Table size="small" aria-label="purchases">
                 <TableHead>
-                  <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                <TableRow className={index % 2 !== 0 ? 'bg-white rounded-lg' : 'bg-lightpink rounded-lg'}>
+                    <TableCell align="center">활동명</TableCell>
+                    <TableCell align="center">점수</TableCell>
+                    <TableCell align="center">활동명</TableCell>
+                    <TableCell align="center">점수</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {row.history.map((historyRow, index) => (
-                    <TableRow key={historyRow.date} >
-                      <TableCell component="th" scope="row">
+                    <TableRow key={historyRow.date}>
+                      <TableCell component="th" scope="row" align="center">
                         {historyRow.date}
                       </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
+                      <TableCell align="center">{historyRow.customerId}</TableCell>
+                      <TableCell align="center">{historyRow.amount}</TableCell>
+                      <TableCell align="center">
                         {Math.round(historyRow.amount * row.price * 100) / 100}
                       </TableCell>
                     </TableRow>
@@ -105,9 +149,9 @@ function Row(props) {
 
 Row.propTypes = {
   row: PropTypes.shape({
-    calories: PropTypes.number.isRequired,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
+    teamNumber: PropTypes.number.isRequired,
+    totalScore: PropTypes.number.isRequired,
+    participateNum: PropTypes.number.isRequired,
     history: PropTypes.arrayOf(
       PropTypes.shape({
         amount: PropTypes.number.isRequired,
@@ -115,23 +159,17 @@ Row.propTypes = {
         date: PropTypes.string.isRequired,
       }),
     ).isRequired,
-    name: PropTypes.string.isRequired,
+    rank: PropTypes.number.isRequired,
     price: PropTypes.number.isRequired,
   }).isRequired,
 };
 
-const rows = [
-  createData('Frozen', 159, 6.0, 24, 4.0),
-  createData('Ice', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Ginge', 356, 16.0, 49, 3.9),
-];
-
-
   return (
     <>
-        <TableContainer component={Paper} className='bg-bgColor mt-10'>
+        <div className='text-2xl font-semibold text-center py-2 bg-pink-100 shadow-md'>
+        실시간 순위표
+        </div>
+        <TableContainer component={Paper} className='bg-bgColor'>
         <Table aria-label="collapsible table" style={{ maxWidth: 'full' }} sx={{ minWidth: 350}} size="small">
             <TableHead className='bg-ppink'>
             <TableRow 
@@ -139,15 +177,25 @@ const rows = [
                     color: 'white',
                 }}>
                 <TableCell />
-                <TableCell style={{ color: 'white', fontWeight: 'bold' }}>등수</TableCell>
-                <TableCell align="right" style={{ color: 'white', fontWeight: 'bold' }}>조 이름</TableCell>
-                <TableCell  style={{ color: 'white', fontWeight: 'bold' }}>참여/총</TableCell>
-                <TableCell align="right" style={{ color: 'white', fontWeight: 'bold' }}>총점</TableCell>
+                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>등수</TableCell>
+                <TableCell align="center"style={{ color: 'white', fontWeight: 'bold' }}>조 이름</TableCell>
+                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>
+                    <button onClick={handleSortByParticipateNum} style={{ color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+                        {!sortByParticipateNum ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon/>}
+                        참여/총
+                    </button>
+                </TableCell>
+                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>
+                    <button onClick={handleSortByTotalScore} style={{ color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+                        {!sortByTotalScore ? <KeyboardArrowUpIcon/> :  <KeyboardArrowDownIcon />}
+                        총점
+                    </button>
+                </TableCell>
             </TableRow>
             </TableHead>
             <TableBody>
             {rows.map((row, index) => (
-                <Row key={row.name} row={row} index={index}/>
+                <Row key={row.teamNumber} row={row} index={index} length={rows.length}/>
             ))}
             </TableBody>
         </Table>

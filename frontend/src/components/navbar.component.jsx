@@ -25,11 +25,11 @@ const Navbar = () => {
     removeFromSession('user');
     setUserAuth({ access_token: null });
     toast.success('로그아웃 되었습니다.', {
-      duration: 1000 // 5초 동안 표시
+        duration: 1000 // 5초 동안 표시
     });
     // 홈페이지로 리디렉션
     setTimeout(() => {
-      window.location.href = '/';
+        window.location.href = '/';
     }, 1000);
   };
 
@@ -43,18 +43,18 @@ const Navbar = () => {
     let query = e.target.value;
 
     if(e.keyCode == 13 && query.length) {
-      navigate(`/search/${query}`);
+        navigate(`/search/${query}`);
     }
   }
 
   const handleBlur = () => {
     setTimeout(() => {
-      setUserNavPanel(false);
+        setUserNavPanel(false);
     }, 200);
   };
   return (
     <>
-      <nav className='navbar flex-items bg-bgColor' >
+      <nav className='navbar flex-items' >
       {access_token ? (
             <>
               <div
@@ -62,15 +62,15 @@ const Navbar = () => {
                 onClick={handleUserNavPanel}
                 onBlur={handleBlur}
               >
-                <button className='w-12 h-12 mt-1'>
-                  <FontAwesomeIcon icon={faBars } size="3x" />
+                <button className='w-12 h-12 mt-1 '>
+                    <FontAwesomeIcon icon={faBars } size="3x" />
                 </button>
                 {userNavPanel ? <UserNavigationPanel /> : ''}
               </div>
               
               <div className='flex items-center gap-3 md:gap-6 ml-auto'></div>
               <button
-                className='btn-dark text-left p-4 hover:bg-grey  py-4'
+                className='btn-dark text-left p-3 hover:bg-grey  py-3'
                 onClick={signOutUser}
               >
                 <h1 className='font-bold text-base mg-1'>로그아웃</h1>
@@ -78,8 +78,8 @@ const Navbar = () => {
             </>
           ) : (
           <>
-            <Link to='/' className='flex-none w-20'>
-              <img src={logo} className='w-full rounded-full' />
+            <Link to='/' className='flex-none w-20 mt-auto'>
+                <img src={logo} className='w-full rounded-full' />
             </Link>
             <div className='flex items-center gap-3 md:gap-6 ml-auto'></div>
             <Link to='/signin' className='btn-dark py-2'>
