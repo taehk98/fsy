@@ -5,7 +5,7 @@ import InputBox from '../components/input.component';
 import { Link, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 // import Button from 'react-bootstrap/Button';
-import {MessageDialog} from './messageDialog';
+// import {MessageDialog} from './messageDialog';
 import { storeInSession } from '../common/session';
 import { UserContext } from '../App';
 
@@ -51,7 +51,7 @@ export function Unauthenticated(props) {
         const scoresAndToken = await response.json();
         storeInSession('user', JSON.stringify(scoresAndToken));
         setUserAuth(scoresAndToken);
-        window.location.href = '/teams';
+        window.location.href = '/rank';
     } else {
       // const body = await response.json();
       toast.error(`로그인 실패: 아이디 또는 비밀번호를 \n다시 확인해주세요.`);
@@ -86,7 +86,6 @@ export function Unauthenticated(props) {
           </button>
         </form>
       </div>
-      <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />
     </>
   );
 }

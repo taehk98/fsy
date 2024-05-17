@@ -14,23 +14,12 @@ const MenuNavigationPanel = () => {
     removeFromSession('user');
     setUserAuth({ access_token: null });
   };
-  
-  // <Link to={`/user/${username}`} className='link pl-8 py-4'>
-          //   Profile
-          // </Link>
-
-        //   <button
-        //   className='text-left p-4 hover:bg-grey w-full pl-8 py-4'
-        //   onClick={signOutUser}
-        // >
-        //   <h1 className='font-bold text-xl mg-1'>Sign Out</h1>
-        //   <p className='text-dark-grey'>@{username}</p>
-        // </button>
 
   return (
     access_token && <AnimationWrapper
-      transition={{ duration: 0.2 }}
-      className='absolute left-0 z-50'
+        keyValue="uniqueKey"
+        transition={{ duration: 0.2 }}
+        className='absolute left-0 z-50'
     >
       <div className='bg-white absolute mt-3 left-0 border border-grey w-60 overflow-hidden duration-200'>
         <Link to='/' className='flex gap-2 link pl-8 py-4 text-black'>
