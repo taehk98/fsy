@@ -41,7 +41,7 @@ function getUserByToken(token) {
 }
 
 function getAdmin(userId) {
-    return collection.findOne({ id: userId });
+    return userCollection.findOne({ id: userId });
 }
 
 // async function createUser(email, password, name, club) {

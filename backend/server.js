@@ -50,18 +50,18 @@ app.use(function (err, req, res, next) {
 // });
 
 apiRouter.post('/auth/login', async (req, res) => {
-const user = await DB.getAdmin(req.body.id);
-if (user) {
-    if (await bcrypt.compare(req.body.password, user.password)) {
-    setAuthCookie(res, user.token);
-    scores = await DB.initialScores(scores);
-    const accessToken = uuidv4();
-    res.send({ scores: scores, accessToken: accessToken });
-    // 호출 시 외부의 attendances 변수를 업데이트함
-    return;
+    const user = await DB.getAdmin(req.body.id);
+    if (user) {
+        if (await bcrypt.compare(req.body.password, user.password)) {
+        scores = await DB.initialScores(scores);
+        const accessToken = uuidv4();
+        setAuthCookie(res, accessToken);
+        res.status(200).send({ scores: scores, access_token: accessToken });
+        // 호출 시 외부의 attendances 변수를 업데이트함
+        return;
+        }
     }
-}
-res.status(401).send({ msg: 'Unauthorized' });
+    res.status(401).send({ msg: `로그인 실패: 아이디 또는 비밀번호를 \n다시 확인해주세요.` });
 });
 
   // DeleteAuth token if stored in cookie
