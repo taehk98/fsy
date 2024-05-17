@@ -82,11 +82,15 @@ export function CollapsibleTable() {
     }
 
 function Row(props) {
-  const { row, index, length } = props;
+  const { row, index } = props;
   const [open, setOpen] = React.useState(false);
   return (
     <React.Fragment>
-      <TableRow style={{ backgroundColor: index % 2 !== 0 ? '#FFEFEF' : 'transpent' }} sx={{ '& > *': { borderBottom: 'unset' } }} >
+        <TableRow style={{
+            backgroundColor: index % 2 !== 0 ? '#FFEFEF' : 'transparent',
+            borderLeft: index < 5 && !rankingOrder ? '5px solid blue' : '',
+            }} sx={{ '& > *': { borderBottom: 'unset' }}} 
+        >
         <TableCell>
           <IconButton
             aria-label="expand row"

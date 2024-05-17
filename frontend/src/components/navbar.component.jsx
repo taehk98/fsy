@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import logo from '../assets/fsy_logo.png';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { UserContext } from '../App';
-import UserNavigationPanel from './user-navigation.component';
+import MenuNavigationPanel from './menu-navigation.component';
 import { removeFromSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -10,7 +10,7 @@ import { faBars } from '@fortawesome/free-solid-svg-icons'
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
-  const [userNavPanel, setUserNavPanel] = useState(false);
+  const [menuNavPanel, setMenuNavPanel] = useState(false);
   
 
   let navigate = useNavigate();
@@ -35,8 +35,8 @@ const Navbar = () => {
 
   
   
-  const handleUserNavPanel = () => {
-    setUserNavPanel((currentVal) => !currentVal);
+  const handleMenuNavPanel = () => {
+    setMenuNavPanel((currentVal) => !currentVal);
   };
 
   const handleSearch = (e) => {
@@ -49,7 +49,7 @@ const Navbar = () => {
 
   const handleBlur = () => {
     setTimeout(() => {
-        setUserNavPanel(false);
+        setMenuNavPanel(false);
     }, 200);
   };
   return (
@@ -59,13 +59,13 @@ const Navbar = () => {
             <>
               <div
                 className='relative'
-                onClick={handleUserNavPanel}
+                onClick={handleMenuNavPanel}
                 onBlur={handleBlur}
               >
                 <button className='w-12 h-12 mt-1 '>
                     <FontAwesomeIcon icon={faBars } size="3x" />
                 </button>
-                {userNavPanel ? <UserNavigationPanel /> : ''}
+                {menuNavPanel ? <MenuNavigationPanel /> : ''}
               </div>
               
               <div className='flex items-center gap-3 md:gap-6 ml-auto'></div>

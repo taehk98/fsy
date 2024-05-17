@@ -4,7 +4,7 @@ import { UserContext } from '../App';
 import { useContext } from 'react';
 import { removeFromSession } from '../common/session';
 
-const UserNavigationPanel = () => {
+const MenuNavigationPanel = () => {
   const {
     userAuth: { access_token },
     setUserAuth,
@@ -33,6 +33,9 @@ const UserNavigationPanel = () => {
       className='absolute left-0 z-50'
     >
       <div className='bg-white absolute mt-3 left-0 border border-grey w-60 overflow-hidden duration-200'>
+        <Link to='/' className='flex gap-2 link pl-8 py-4 text-black'>
+          <p>홈</p>
+        </Link>
         <Link to='/editor' className='flex gap-2 link  pl-8 py-4 text-black'>
           <p>조 관리</p>
         </Link>
@@ -40,7 +43,7 @@ const UserNavigationPanel = () => {
           <p>활동 관리</p>
         </Link>
         <Link to='/editor' className='flex gap-2 link pl-8 py-4 text-black'>
-          <p>점수 현황</p>
+          <p>점수 기입</p>
         </Link>
         <span className='absolute border-t border-grey w-[100%]'></span>
       </div>
@@ -48,4 +51,4 @@ const UserNavigationPanel = () => {
   );
 };
 
-export default UserNavigationPanel;
+export default MenuNavigationPanel;

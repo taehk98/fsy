@@ -31,7 +31,7 @@ function App() {
           <Route path='/' element={<Navbar />}>
             <Route index element={<HomePage />} />
             <Route path='/signin' element={<Unauthenticated />} />
-            <Route path='/teams' element={<CollapsibleTable />} />
+            <Route path='/rank' element={<CollapsibleTable />} />
             <Route path='*' element={<PageNotFound />} />
           </Route>
         </Routes>

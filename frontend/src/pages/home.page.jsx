@@ -12,7 +12,7 @@ const HomePage = () => {
         </div>
     
         <div className='pt-6 flex flex-items gap-5'>
-        <Link to='/editor' className='mb-20 lg-mb-30 rounded-xl bg-gradient-to-r from-indigo-500 
+        <Link to='/rank' className='mb-20 lg-mb-30 rounded-xl bg-gradient-to-r from-indigo-500 
         via-purple-500 to-pink-500 hover:from-indigo-400  hover:via-pink-400 hover:to-red-500 px-6 py-4 font-bold text-white text-2xl'>실시간 순위 보기</Link>
         </div>
       </section>
