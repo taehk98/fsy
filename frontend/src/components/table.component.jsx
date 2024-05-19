@@ -84,6 +84,42 @@ export function CollapsibleTable() {
 function Row(props) {
   const { row, index } = props;
   const [open, setOpen] = React.useState(false);
+//   if(index > 0 && rows[index].totalScore !== rows[index-1].totalScore) {
+    //     setRankingOnTotal(index);
+    //   }
+    //   console.log(rankingOrder);
+    //   console.log(index);
+    //   console.log(row.totalScore);
+    //   console.log(clicked);
+    //   let ranking;
+    //   if(clicked === 'totalScore') {
+    //     if (rankingOrder === false) {
+    //         for(let i = index; i > 0; i--) {
+    //             if (rows[i].totalScore === rows[i-1].totalScore) {
+    //                 ranking = i;
+    //             } else {
+    //                 if(ranking == index-1) {
+    //                     ranking = index;
+    //                 }
+    //                 break;
+    //             }
+    //         }
+    //         if(index === 0) {
+    //             ranking = 1;
+    //         }
+    //     } else if (rankingOrder === true) {
+    //         for(let i = index; i > 0; i--) {
+    //             if (rows[i].totalScore === rows[i-1].totalScore) {
+    //                 ranking = i;
+    //             } else {
+    //                 break;
+    //             }
+    //         }
+    //         if(index === 0) {
+    //             ranking = rows.length;
+    //         }
+    //     }
+    //   }
   return (
     <React.Fragment>
         <TableRow style={{

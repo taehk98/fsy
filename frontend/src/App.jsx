@@ -7,6 +7,7 @@ import PageNotFound from './pages/404.page';
 import Navbar from './components/navbar.component';
 import {CollapsibleTable} from './components/table.component.jsx';
 import {Unauthenticated} from './login/unauthenticated.jsx';
+import {TeamList} from './pages/teams-management.page.jsx;'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export const UserContext = createContext({});
@@ -32,6 +33,7 @@ function App() {
             <Route index element={<HomePage />} />
             <Route path='/signin' element={<Unauthenticated />} />
             <Route path='/rank' element={<CollapsibleTable />} />
+            <Route path='/team' element={<TeamList/>}/>
             <Route path='*' element={<PageNotFound />} />
           </Route>
         </Routes>

@@ -25,7 +25,7 @@ const MenuNavigationPanel = () => {
         <Link to='/' className='flex gap-2 link pl-8 py-4 text-black'>
           <p>홈</p>
         </Link>
-        <Link to='/editor' className='flex gap-2 link  pl-8 py-4 text-black'>
+        <Link to='/team' className='flex gap-2 link  pl-8 py-4 text-black'>
           <p>조 관리</p>
         </Link>
         <Link to='/editor' className='flex gap-2 link pl-8 py-4 text-black'>
