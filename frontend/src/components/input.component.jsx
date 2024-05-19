@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const InputBox = ({ name, type, id, value, placeholder, icon }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);

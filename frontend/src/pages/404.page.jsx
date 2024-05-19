@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link }from "react-router-dom"
 import pageNotFoundImage from "../assets/404.png";
 import fullLogo from "../assets/fsy_logo.png"

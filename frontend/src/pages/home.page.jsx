@@ -1,3 +1,4 @@
+import React from 'react';
 import AnimationWrapper from '../common/page-animation';
 import shorts from '../assets/fsy_activity_day.jpg';
 import logo from '../assets/fsy_logo.png';

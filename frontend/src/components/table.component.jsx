@@ -206,11 +206,12 @@ Row.propTypes = {
 
   return (
     <>
-        <div className='text-2xl font-semibold text-center py-2 bg-pink-100 shadow-md'>
+        <div className='text-2xl rounded font-semibold text-center py-2 bg-pink-100 mx-2'>
         실시간 순위표
         </div>
-        <TableContainer component={Paper} className='bg-bgColor'>
-        <Table aria-label="collapsible table" style={{ maxWidth: 'full' }} sx={{ minWidth: 350}} size="small">
+        <div className='mx-2'>
+        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%' }} >
+        <Table aria-label="collapsible table" style={{ maxWidth: '100%' }} sx={{ minWidth: 350}} size="small">
             <TableHead className='bg-ppink'>
             <TableRow 
                 sx={{
@@ -218,7 +219,7 @@ Row.propTypes = {
                 }}>
                 <TableCell />
                 <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>등수</TableCell>
-                <TableCell align="center"style={{ color: 'white', fontWeight: 'bold' }}>조 이름</TableCell>
+                <TableCell align="center"style={{ color: 'white', fontWeight: 'bold' }}>조</TableCell>
                 <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>
                     <button onClick={handleSortByParticipateNum} style={{ color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
                         {!sortByParticipateNum ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon/>}
@@ -240,6 +241,7 @@ Row.propTypes = {
             </TableBody>
         </Table>
         </TableContainer>
+        </div>
     </>  
   );
 }

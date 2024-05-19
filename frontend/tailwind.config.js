@@ -20,7 +20,11 @@ export default {
         green: '#618264',
         ppink: '#D982BA',
         bblue: '#2594D9',
-        lightpink: '#FFE6E6'
+        lightpink: '#FFE6E6',
+        fsygreen: '#26BFBF',
+        fsylightblue: '#25A6D9',
+        fsyblue: '#2594D9',
+        orange: '#FFEFEF'
         // 더연한거 FAFCFF / #F5F8FC
       },
       fontSize: {

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import React , { useContext, useState }  from 'react';
 import logo from '../assets/fsy_logo.png';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { UserContext } from '../App';
@@ -25,7 +25,7 @@ const Navbar = () => {
     removeFromSession('user');
     setUserAuth({ access_token: null });
     toast.success('로그아웃 되었습니다.', {
-        duration: 1000 // 5초 동안 표시
+        duration: 1000 // 1초 동안 표시
     });
     // 홈페이지로 리디렉션
     setTimeout(() => {
@@ -54,7 +54,7 @@ const Navbar = () => {
   };
   return (
     <>
-      <nav className='navbar flex-items' >
+      <nav className='navbar flex-items'  >
       {access_token ? (
             <>
               <div

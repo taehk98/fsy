@@ -16,11 +16,11 @@
     border-color: transparent;
   }
 #list1 .form-control:focus {
-border-color: transparent;
-box-shadow: none;
+    border-color: transparent;
+    box-shadow: none;
 }
 #list1 .select-input.form-control[readonly]:not([disabled]) {
-background-color: #fbfbfb;
+background-color: #FFE6E6;  
 }
 
 @layer components {
@@ -53,7 +53,7 @@ background-color: #fbfbfb;
   }
 
   .navbar {
-    @apply z-10 sticky top-0 flex items-center gap-12 w-full px-[5vw] h-[80px] border-b border-grey;
+    @apply z-10 sticky top-0 flex items-center gap-12 w-full px-[5vw] h-[80px] shadow-none;
   }
 
   .h-cover {

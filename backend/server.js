@@ -19,7 +19,8 @@ app.use(express.json());
 // Use the cookie parser middleware for tracking authentication tokens
 app.use(cookieParser());
 
-app.use(express.static('public'));
+app.use(express.static('frontend'));
+//app.use(express.static('public'));
 
 app.use(cors());
 
@@ -53,9 +54,10 @@ apiRouter.post('/auth/login', async (req, res) => {
     const user = await DB.getAdmin(req.body.id);
     if (user) {
         if (await bcrypt.compare(req.body.password, user.password)) {
-        scores = await DB.initialScores(scores);
+        scores = await DB.initialScores();
         const accessToken = uuidv4();
         setAuthCookie(res, accessToken);
+        await DB.setAdminToken(accessToken);
         res.status(200).send({ scores: scores, access_token: accessToken });
         // 호출 시 외부의 attendances 변수를 업데이트함
         return;
@@ -84,6 +86,25 @@ if (user) {
 }
 });
 
+secureApiRouter.get('/get-activityList', async (req, res) => {
+    const activities = await DB.getActivityList();
+    
+    res.send(activities);
+})
+
+secureApiRouter.post('/insert-team', async (req, res) => {
+    try {
+        authToken = req.cookies[authCookieName];
+        const scores = await DB.insertTeam(req.body);
+        res.status(200).send({scores: scores, access_token: authToken});
+    } catch(err) {
+        res.status(400)
+    }
+})
+
+
+///////////////////////////////////////////// manageyourclub below
+
 //used for one attendance change
 secureApiRouter.post('/save-attendance', async (req, res) => {
     await DB.updateAttendances(req.body, attendances);
@@ -110,7 +131,7 @@ secureApiRouter.post('/attendances', async (req, res) => {
 });
 
 app.use((_req, res) => {
-    res.sendFile('index.html', { root: 'public' });
+    res.sendFile('index.html', { root: path.join(__dirname, '../frontend') });
   });
 
 const httpService = app.listen(port, () => {

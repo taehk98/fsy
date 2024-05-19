@@ -39,8 +39,8 @@ export function Unauthenticated(props) {
   // }
 
   async function loginOrCreate(endpoint, formData) {
-    const SERVER_DOMAIN = 'http://localhost:3000';
-    const response = await fetch(SERVER_DOMAIN + endpoint, {
+    // const SERVER_DOMAIN = 'http://localhost:3000';
+    const response = await fetch(endpoint, {
       method: 'post',
       body: JSON.stringify(formData),
       headers: {
