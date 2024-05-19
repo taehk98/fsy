@@ -1,4 +1,5 @@
 import React from "react";
+import './teams-management.css';
 import {
   MDBBtn,
   MDBCard,
@@ -10,11 +11,8 @@ import {
   MDBListGroup,
   MDBListGroupItem,
   MDBRow,
-  MDBSelect,
   MDBTooltip,
 } from "mdb-react-ui-kit";
-
-import './teams-management.css';
 
 export function TeamList() {
   return (
@@ -26,9 +24,9 @@ export function TeamList() {
             style={{ borderRadius: ".75rem", backgroundColor: "#eff1f2" }}
           >
             <MDBCardBody className="py-4 px-4 px-md-5">
-              <p className="h1 text-center mt-3 mb-4 pb-3 text-primary">
+              <p className="  text-center py-2 ">
                 <MDBIcon fas icon="check-square" className="me-1" />
-                <u>My Todo-s</u>
+                <u className='font-bold text-3xl no-underline'>조 관리</u>
               </p>
               <div className="pb-2">
                 <MDBCard>
@@ -40,18 +38,6 @@ export function TeamList() {
                         id="exampleFormControlInput1"
                         placeholder="Add new..."
                       />
-                      <MDBTooltip
-                        tag="a"
-                        wrapperProps={{ href: "#!" }}
-                        title="Set due date"
-                      >
-                        <MDBIcon
-                          fas
-                          icon="calendar-alt"
-                          size="lg"
-                          className="me-3"
-                        />
-                      </MDBTooltip>
                       <div>
                         <MDBBtn>Add</MDBBtn>
                       </div>
@@ -63,21 +49,6 @@ export function TeamList() {
 
               <div className="d-flex justify-content-end align-items-center mb-4 pt-2 pb-3">
                 <p className="small mb-0 me-2 text-muted">Filter</p>
-                <MDBSelect
-                  data={[
-                    { text: "All", value: 1 },
-                    { text: "Completed", value: 2 },
-                    { text: "Active", value: 3 },
-                    { text: "Has due date", value: 4 },
-                  ]}
-                />
-                <p className="small mb-0 ms-4 me-2 text-muted">Sort</p>
-                <MDBSelect
-                  data={[
-                    { text: "Added date", value: 1 },
-                    { text: "Due date", value: 2 },
-                  ]}
-                />
                 <MDBTooltip
                   tag="a"
                   wrapperProps={{ href: "#!" }}

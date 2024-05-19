@@ -7,8 +7,9 @@ import PageNotFound from './pages/404.page';
 import Navbar from './components/navbar.component';
 import {CollapsibleTable} from './components/table.component.jsx';
 import {Unauthenticated} from './login/unauthenticated.jsx';
-import {TeamList} from './pages/teams-management.page.jsx;'
+import {TeamList} from './pages/teams-management.page.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
 export const UserContext = createContext({});
 
