@@ -16,12 +16,8 @@ const MenuNavigationPanel = () => {
   };
 
   return (
-    access_token && <AnimationWrapper
-        keyValue="uniqueKey"
-        transition={{ duration: 0.2 }}
-        className='absolute left-0 z-50'
-    >
-      <div className='bg-white absolute mt-3 left-0 border border-grey w-60 overflow-hidden duration-200'>
+    access_token && 
+      <div className='bg-white absolute mt-3 left-0 border border-grey w-52 md:w-60 overflow-hidden duration-200'>
         <Link to='/rank' className='flex gap-2 link pl-8 py-4 text-black'>
           <p>순위</p>
         </Link>
@@ -36,7 +32,6 @@ const MenuNavigationPanel = () => {
         </Link>
         <span className='absolute border-t border-grey w-[100%]'></span>
       </div>
-    </AnimationWrapper>
   );
 };
 
