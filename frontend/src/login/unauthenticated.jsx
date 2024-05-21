@@ -20,6 +20,7 @@ export function Unauthenticated(props) {
   const [displayError, setDisplayError] = React.useState(null);
 
   async function loginUser(e)  {
+    let id = toast.loading("로그인 중입니다.");
     e.preventDefault();
     // formData
     let form = new FormData(formElement);
@@ -28,7 +29,7 @@ export function Unauthenticated(props) {
     for (let [key, value] of form.entries()) {
       formData[key] = value;
     }
-    loginOrCreate(`/api/auth/login`, formData);
+    loginOrCreate(`/api/auth/login`, formData, id);
   }
 
   // async function createUser() {
@@ -38,8 +39,7 @@ export function Unauthenticated(props) {
   //   loginOrCreate(`/api/auth/create`);
   // }
 
-  async function loginOrCreate(endpoint, formData) {
-    // const SERVER_DOMAIN = 'http://localhost:3000';
+  async function loginOrCreate(endpoint, formData, id) {
     const response = await fetch(endpoint, {
       method: 'post',
       body: JSON.stringify(formData),
@@ -48,13 +48,21 @@ export function Unauthenticated(props) {
       },
     });
     if (response?.status === 200) {
-        const scoresAndToken = await response.json();
-        storeInSession('user', JSON.stringify(scoresAndToken));
-        setUserAuth(scoresAndToken);
+        const scoresAndTokenAndId = await response.json();
+        toast.success(`로그인 성공`, {
+            id: id,
+    });
+    setTimeout(() => {
+        storeInSession('user', JSON.stringify(scoresAndTokenAndId));
+        setUserAuth(scoresAndTokenAndId);
         window.location.href = '/rank';
+    }, 1000);      
     } else {
       // const body = await response.json();
-      toast.error(`로그인 실패: 아이디 또는 비밀번호를 \n다시 확인해주세요.`);
+      toast.error(`로그인 실패: 아이디 또는 비밀번호를 \n다시 확인해주세요.`, {
+            id: id,
+            duration: 2000
+      });
     }
   }
 
