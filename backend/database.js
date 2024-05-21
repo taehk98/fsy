@@ -33,9 +33,9 @@ async function initialScores() {
     }
 }
 
-async function setAdminToken(token) {
+async function setAdminToken(id, token) {
     return await userCollection.updateOne(
-        { id: "admin" },
+        { id: id },
         { $set: { token: token } }
     );
 }

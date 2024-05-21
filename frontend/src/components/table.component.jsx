@@ -212,7 +212,7 @@ Row.propTypes = {
                     color: 'white',
                 }}>
                 <TableCell />
-                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>등수</TableCell>
+                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>순위</TableCell>
                 <TableCell align="center"style={{ color: 'white', fontWeight: 'bold' }}>조</TableCell>
                 <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>
                     <button onClick={handleSortByParticipateNum} style={{ color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>

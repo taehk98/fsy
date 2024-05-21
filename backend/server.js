@@ -13,6 +13,7 @@ const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 const authCookieName = 'token';
 let scores = [];
+let userID = '';
 
 
 app.use(express.json());
@@ -58,8 +59,9 @@ apiRouter.post('/auth/login', async (req, res) => {
         scores = await DB.initialScores();
         const accessToken = uuidv4();
         setAuthCookie(res, accessToken);
-        await DB.setAdminToken(accessToken);
-        res.status(200).send({ scores: scores, access_token: accessToken });
+        await DB.setAdminToken(req.body.id, accessToken);
+        userID = req.body.id;
+        res.status(200).send({ scores: scores, access_token: accessToken, id: userID });
         // 호출 시 외부의 attendances 변수를 업데이트함
         return;
         }
@@ -97,7 +99,7 @@ secureApiRouter.post('/insert-team', async (req, res) => {
     try {
         authToken = req.cookies[authCookieName];
         const scores = await DB.insertTeam(req.body);
-        res.status(200).send({scores: scores, access_token: authToken});
+        res.status(200).send({scores: scores , access_token: authToken , id: userID});
     } catch(err) {
         res.status(400)
     }
@@ -113,7 +115,7 @@ secureApiRouter.delete('/delete-team/:id', async (req, res) => {
     try {
         const scores = await DB.deleteTeam(id);
         authToken = req.cookies[authCookieName];
-        res.status(200).send({scores: scores, access_token: authToken});
+        res.status(200).send({scores: scores , access_token: authToken , id: userID});
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred while trying to delete the document');
@@ -125,7 +127,7 @@ secureApiRouter.delete('/delete-multiple-teams', async (req, res) => {
     try{
         const scores = await DB.deleteMultipleTeams(teamIDs);
         authToken = req.cookies[authCookieName];
-        res.status(200).send({scores: scores, access_token: authToken});
+        res.status(200).send({scores: scores, access_token: authToken , id: userID});
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred while trying to delete the document');

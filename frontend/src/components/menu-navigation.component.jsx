@@ -6,7 +6,7 @@ import { removeFromSession } from '../common/session';
 
 const MenuNavigationPanel = () => {
   const {
-    userAuth: { access_token },
+    userAuth: { access_token, id },
     setUserAuth,
   } = useContext(UserContext);
 
@@ -24,12 +24,16 @@ const MenuNavigationPanel = () => {
         <Link to='/rank' className='flex gap-2 link pl-8 py-3 text-black'>
           <p>순위</p>
         </Link>
-        <Link to='/team' className='flex gap-2 link  pl-8 py-3 text-black'>
-          <p>조 관리</p>
-        </Link>
-        <Link to='/editor' className='flex gap-2 link pl-8 py-3 text-black'>
-          <p>활동 관리</p>
-        </Link>
+        {id === 'admin' && (
+          <>
+            <Link to='/team' className='flex gap-2 link pl-8 py-3 text-black'>
+              <p>조 관리</p>
+            </Link>
+            <Link to='/editor' className='flex gap-2 link pl-8 py-3 text-black'>
+              <p>활동 관리</p>
+            </Link>
+          </>
+        )}
         <Link to='/editor' className='flex gap-2 link pl-8 py-3 text-black'>
           <p>점수 기입</p>
         </Link>

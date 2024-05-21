@@ -2,7 +2,6 @@ import React , { useContext, useState } from 'react';
 import { UserContext } from '../App';
 import { lookInSession, storeInSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
-import './teams-management.css';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
@@ -48,10 +47,10 @@ export function TeamList() {
             }
     
             if (response.status === 200) {
-                const scoresAndToken = await response.json();
-                storeInSession('user', JSON.stringify(scoresAndToken));
-                setUserAuth(scoresAndToken);
-                setRows(scoresAndToken.scores);
+                const scoresAndTokenAndId = await response.json();
+                storeInSession('user', JSON.stringify(scoresAndTokenAndId));
+                setUserAuth(scoresAndTokenAndId);
+                setRows(scoresAndTokenAndId.scores);
                 setTeamName('');
                 toast.success('조를 추가했습니다.', {
                     id: toastID,
@@ -132,10 +131,10 @@ export function TeamList() {
             if (!response.ok) {
                 throw new Error('조 삭제에 실패했습니다.');
             }
-            const scoresAndToken = await response.json();
-            storeInSession('user', JSON.stringify(scoresAndToken));
-            setUserAuth(scoresAndToken);
-            setRows(scoresAndToken.scores);
+            const scoresAndTokenAndId = await response.json();
+            storeInSession('user', JSON.stringify(scoresAndTokenAndId));
+            setUserAuth(scoresAndTokenAndId);
+            setRows(scoresAndTokenAndId.scores);
             toast.success(`${teamName}조를 삭제했습니다`, {
                 id: id,
                 duration: 2000, // 2초 동안 표시
@@ -188,10 +187,10 @@ export function TeamList() {
             if (!response.ok) {
                 throw new Error('선택된 항목을 삭제하는 데 실패했습니다.');
             }
-            const scoresAndToken = await response.json();
-            storeInSession('user', JSON.stringify(scoresAndToken));
-            setUserAuth(scoresAndToken);
-            setRows(scoresAndToken.scores);
+            const scoresAndTokenAndId = await response.json();
+            storeInSession('user', JSON.stringify(scoresAndTokenAndId));
+            setUserAuth(scoresAndTokenAndId);
+            setRows(scoresAndTokenAndId.scores);
             setCheckedRows([]);
             toast.success(`선택된 조들을 삭제했습니다`, {
                 id: id,
