@@ -115,7 +115,7 @@ export function TeamList() {
             teamName: teamName,
             totalScore: 0,
             participateNum: 0,
-            activitities: activitiesObject
+            activities: activitiesObject
         }
 
         await insertTeam(newTeam, id);

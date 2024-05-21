@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React , { useContext, useState, useEffect } from 'react';
+import { UserContext } from '../App';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -15,26 +16,37 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export function CollapsibleTable() {
+    const {
+        userAuth: { access_token, scores },
+        setUserAuth,
+    } = useContext(UserContext);
 
-    const totalNum = 30;
+    const totalNum = scores ? Object.keys(scores[0]['activities']).length : 20;
 
-    const [rows, setRows] = React.useState([
-        createData(2, 1, 6.0, 24, 4.0),
-        createData(1, 2, 9.0, 37, 4.3),
-        createData(3, 3, 16.0, 24, 6.0),
-        createData(4, 4, 3.7, 67, 4.3),
-        createData(5, 5, 16.0, 49, 3.9),
-      ]);
+    const newDataArray = [];
+    if(scores) {
+        Object.values(scores).forEach(scoreObj => {
+            const { teamName, participateNum, totalScore, activities } = scoreObj;
+            newDataArray.push(createData(teamName, participateNum, totalScore, activities));
+        });
+    }else {
+
+    }
+    
+
+    const [rows, setRows] = React.useState(newDataArray);
 
     const [sortByTotalScore, setSortByTotalScore] = React.useState(null);
     const [sortByParticipateNum, setSortByParticipateNum] = React.useState(null);
     const [rankingOrder, setRankingOrder] = React.useState(null);
+    const [clicked, setClicked] = React.useState(null);
 
     const handleSortByTotalScore = () => {
         const sortedRows = [...rows].sort((a, b) => b.totalScore - a.totalScore);
         setRows(sortByTotalScore ? sortedRows.reverse() : sortedRows);
         setSortByTotalScore(!sortByTotalScore);
         setSortByParticipateNum(null);
+        setClicked('totalScore');
         if(sortByTotalScore) {
             setRankingOrder(true);
         } else {
@@ -47,6 +59,7 @@ export function CollapsibleTable() {
         setRows(sortByParticipateNum ? sortedRows.reverse() : sortedRows);
         setSortByParticipateNum(!sortByParticipateNum);
         setSortByTotalScore(null);
+        setClicked('participateNum');
         if(sortByParticipateNum) {
             setRankingOrder(true);
         } else {
@@ -59,67 +72,69 @@ export function CollapsibleTable() {
         handleSortByTotalScore();
     }, []);
 
-    function createData(rank, teamNumber, participateNum, totalScore, price) {
+    function createData(teamNumber, participateNum, totalScore, activities) {
     return {
-        rank,
         teamNumber,
         participateNum,
         totalScore,
-        price,
-        history: [
-        {
-            date: '2020-01-05',
-            customerId: '11091700',
-            amount: 3,
-        },
-        {
-            date: '2020-01-02',
-            customerId: 'Anonymous',
-            amount: 1,
-        },
-        ],
+        activities
     };
     }
 
 function Row(props) {
-  const { row, index } = props;
-  const [open, setOpen] = React.useState(false);
-//   if(index > 0 && rows[index].totalScore !== rows[index-1].totalScore) {
-    //     setRankingOnTotal(index);
-    //   }
-    //   console.log(rankingOrder);
-    //   console.log(index);
-    //   console.log(row.totalScore);
-    //   console.log(clicked);
-    //   let ranking;
-    //   if(clicked === 'totalScore') {
-    //     if (rankingOrder === false) {
-    //         for(let i = index; i > 0; i--) {
-    //             if (rows[i].totalScore === rows[i-1].totalScore) {
-    //                 ranking = i;
-    //             } else {
-    //                 if(ranking == index-1) {
-    //                     ranking = index;
-    //                 }
-    //                 break;
-    //             }
-    //         }
-    //         if(index === 0) {
-    //             ranking = 1;
-    //         }
-    //     } else if (rankingOrder === true) {
-    //         for(let i = index; i > 0; i--) {
-    //             if (rows[i].totalScore === rows[i-1].totalScore) {
-    //                 ranking = i;
-    //             } else {
-    //                 break;
-    //             }
-    //         }
-    //         if(index === 0) {
-    //             ranking = rows.length;
-    //         }
-    //     }
-    //   }
+    const { row, index } = props;
+    const [open, setOpen] = React.useState(false);
+    let ranking;
+    let currScore;
+    if(clicked === 'totalScore') {
+        currScore = rows[index].totalScore;
+        if (rankingOrder === false) {
+            ranking = index + 1;
+            for(let i = index; i > 0; i--) {
+                if (currScore === rows[i-1].totalScore) {
+                    ranking = i;
+                } else {   
+                    break;
+                }
+            }
+            if(index === 0) {
+                ranking = 1;
+            }
+        } else if (rankingOrder === true) {
+            ranking = rows.length - index;
+            for(let i = index; i < rows.length -1; i++) {
+                if (currScore === rows[i + 1].totalScore) {
+                    ranking = ranking - 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    } else if (clicked === 'participateNum') {
+        currScore = rows[index].participateNum;
+        if (rankingOrder === false) {
+            ranking = index + 1;
+            for(let i = index; i > 0; i--) {
+                if (currScore === rows[i-1].participateNum) {
+                    ranking = i;
+                } else {   
+                    break;
+                }
+            }
+            if(index === 0) {
+                ranking = 1;
+            }
+        } else if (rankingOrder === true) {
+            ranking = rows.length - index;
+            for(let i = index; i < rows.length -1; i++) {
+                if (currScore === rows[i + 1].participateNum) {
+                    ranking = ranking - 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
   return (
     <React.Fragment>
         <TableRow style={{
@@ -136,7 +151,9 @@ function Row(props) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" align="center" >
-            {rankingOrder ? (rows.length - index) : (index + 1) }등
+            {/* {rankingOrder ? (rows.length - index) : (index + 1) }등
+             */}
+             {ranking}등
         </TableCell>
         <TableCell align="center" >{row.teamNumber}조</TableCell>
         <TableCell align="center" >{row.participateNum} / {totalNum}</TableCell>
@@ -159,18 +176,29 @@ function Row(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.history.map((historyRow, index) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row" align="center">
-                        축구
-                      </TableCell>
-                      <TableCell align="center">100</TableCell>
-                      <TableCell align="center">농구</TableCell>
-                      <TableCell align="center">
-                        80
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                {Object.entries(row.activities).map(([activityName, score], index) => (
+                    index % 2 === 0 ? (
+                        // 짝수 번째 활동인 경우
+                        <TableRow key={index}>
+                            <TableCell component="th" scope="row" align="center">
+                                {activityName}
+                            </TableCell>
+                            <TableCell align="center">{score}</TableCell>
+                            {/* 다음 홀수 번째 활동이 있는지 확인하고 있으면 렌더링 */}
+                            {index + 1 < Object.entries(row.activities).length && (
+                                <TableCell component="th" scope="row" align="center">
+                                    {Object.entries(row.activities)[index + 1][0]}
+                                </TableCell>
+                            )}
+                            {/* 다음 홀수 번째 활동의 점수가 있는지 확인하고 있으면 렌더링 */}
+                            {index + 1 < Object.entries(row.activities).length && (
+                                <TableCell align="center">
+                                    {Object.entries(row.activities)[index + 1][1]}
+                                </TableCell>
+                            )}
+                        </TableRow>
+                    ) : null
+                ))}
                 </TableBody>
               </Table>
             </Box>
@@ -183,18 +211,8 @@ function Row(props) {
 
 Row.propTypes = {
   row: PropTypes.shape({
-    teamNumber: PropTypes.number.isRequired,
     totalScore: PropTypes.number.isRequired,
     participateNum: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    rank: PropTypes.number.isRequired,
-    price: PropTypes.number.isRequired,
   }).isRequired,
 };
 
