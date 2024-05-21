@@ -175,7 +175,35 @@ export function TeamList() {
     };
 
     const deleteCheckedTeams = async () => {
-        // checkedRows
+        const id = toast.loading(`선택된 조들을 삭제중입니다.`);
+        try {
+            const response = await fetch('/api/delete-multiple-teams' , {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(checkedRows),
+            });
+
+            if (!response.ok) {
+                throw new Error('선택된 항목을 삭제하는 데 실패했습니다.');
+            }
+            const scoresAndToken = await response.json();
+            storeInSession('user', JSON.stringify(scoresAndToken));
+            setUserAuth(scoresAndToken);
+            setRows(scoresAndToken.scores);
+            setCheckedRows([]);
+            toast.success(`선택된 조들을 삭제했습니다`, {
+                id: id,
+                duration: 2000, // 2초 동안 표시
+            });    
+
+        }catch (error) {
+            toast.error('선택된 항목을 삭제하는 데 실패했습니다.', {
+                id: id,
+                duration: 2000 // 1초 동안 표시
+            });
+          }
     }
 
     const confirmDeleteCheckedTeams = () => {
@@ -184,7 +212,7 @@ export function TeamList() {
              buttons: [
                 {
                 label: '예',
-                onClick: () => deleteSelectedTeams(),
+                onClick: () => deleteCheckedTeams(),
                 },
                 {
                 label: '아니오',
