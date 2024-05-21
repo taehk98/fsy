@@ -120,6 +120,18 @@ secureApiRouter.delete('/delete-team/:id', async (req, res) => {
     }
 });
 
+secureApiRouter.delete('/delete-multiple-teams', async (req, res) => {
+    const teamIDs = req.body;
+    try{
+        const scores = await DB.deleteMultipleTeams(teamIDs);
+        authToken = req.cookies[authCookieName];
+        res.status(200).send({scores: scores, access_token: authToken});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while trying to delete the document');
+    }
+})
+
 
 ///////////////////////////////////////////// manageyourclub below
 

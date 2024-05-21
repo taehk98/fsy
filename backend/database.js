@@ -74,14 +74,52 @@ async function insertTeam(team) {
 async function deleteTeam(teamID) {
     try {
       const result = await scoresCollection.deleteOne({ _id: new ObjectId(teamID) });
+      // 재시도 로직 추가
       if (result.deletedCount === 0) {
-        throw error;
-      }
+        // console.warn(`Document not found on first try for _id: ${teamID}. Retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1초 대기
+        result = await scoresCollection.deleteOne({ _id: new ObjectId(teamID) });
+    }
+
+    if (result.deletedCount === 0) {
+        console.error(`해당 조를 찾지 못했습니다: ${teamID}`);
+        throw new Error(`해당 조를 찾지 못했습니다: ${teamID}`);
+    }
       return await initialScores();
     } catch (error) {
-      throw error;
+        throw new Error('팀들 삭제에 실패했습니다.');
     }
   }
+
+async function deleteMultipleTeams(teamIDs) {
+    try {
+        for (let i = 0; i < teamIDs.length; i++) {
+            let objectId;
+            try {
+                objectId = new ObjectId(teamIDs[i]);
+            } catch (error) {
+                console.error(`Invalid ObjectId: ${teamIDs[i]} - ${error.message}`);
+                throw new Error(`Invalid ObjectId: ${teamIDs[i]}`);
+            }
+
+            const result = await scoresCollection.deleteOne({ _id: objectId });
+             // 재시도 로직 추가
+             if (result.deletedCount === 0) {
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1초 대기
+                result = await scoresCollection.deleteOne({ _id: objectId });
+            }
+
+            if (result.deletedCount === 0) {
+                console.error(`해당 조를 찾지 못했습니다: ${teamIDs[i]}`);
+                throw new Error(`해당 조를 찾지 못했습니다: ${teamIDs[i]}`);
+            }
+        }
+        return await initialScores();
+    } catch (error) {
+        console.error(`팀들 삭제에 실패했습니다: ${error.message}`);
+        throw new Error('팀들 삭제에 실패했습니다.');
+    }
+}
 
 // async function createUser(email, password, name, club) {
 //     // Hash the password before we insert it into the database
@@ -148,5 +186,6 @@ module.exports = {
     updateAttendances,
     replaceAttentances,
     getAdmin,
-    deleteTeam
+    deleteTeam,
+    deleteMultipleTeams
 };
