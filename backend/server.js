@@ -102,6 +102,21 @@ secureApiRouter.post('/insert-team', async (req, res) => {
     }
 })
 
+secureApiRouter.put('/update-score-by-activity', async (req, res) => {
+    try {
+        const { activityId, teamId, newScore } = req.body;
+        console.log(typeof teamId)
+        if (!activityId || !teamId || typeof newScore !== 'number') {
+            return res.status(400).send({ msg: 'Invalid input data' });
+        }
+        const updatedScores = await DB.updateScoresByActivity(activityId, teamId, newScore);
+        res.status(200).send(updatedScores);
+    } catch (err) {
+        console.error('Error updating score by activity:', err);
+        res.status(500).send({ msg: 'Failed to update score' });
+    }
+});
+
 
 ///////////////////////////////////////////// manageyourclub below
 

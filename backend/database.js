@@ -126,6 +126,34 @@ async function replaceAttentances(newAttendances, attendances) {
     return attendances;
 }
 
+async function updateScoresByActivity(activityId, teamId, newScore) {
+    try {
+        const team = await scoresCollection.findOne({ teamName: teamId });
+        console.log(team)
+        if (!team) {
+            throw new Error('Team not found');
+        }
+
+        // Update the activity score
+        team.activities[activityId] = newScore;
+
+        // Recalculate total score
+        team.totalScore = Object.values(team.activities).reduce((total, score) => total + score, 0);
+
+        // Update the document in the database
+        await scoresCollection.updateOne(
+            { _id: new ObjectId(teamId) },
+            { $set: { activities: team.activities, totalScore: team.totalScore } }
+        );
+
+        // Return the updated scores
+        return await initialScores();
+    } catch (err) {
+        console.error('Failed to update scores by activity:', err);
+        throw err;
+    }
+}
+
 module.exports = {
     getUser,
     getUserByToken,
@@ -133,6 +161,7 @@ module.exports = {
     getActivityList,
     initialScores,
     insertTeam,
+    updateScoresByActivity,
     updateAttendances,
     replaceAttentances,
     getAdmin
