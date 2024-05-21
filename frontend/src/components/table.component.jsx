@@ -124,7 +124,6 @@ function Row(props) {
     <React.Fragment>
         <TableRow style={{
             backgroundColor: index % 2 !== 0 ? '#FFEFEF' : 'transparent',
-            borderLeft: index < 5 && !rankingOrder ? '5px solid blue' : '',
             }} sx={{ '& > *': { borderBottom: 'unset' }}} 
         >
         <TableCell>
@@ -147,17 +146,12 @@ function Row(props) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 0 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                참여율
+              <Typography variant="h6" gutterBottom component="div" className='pt-1'>
+                활동별 점수
               </Typography>
-              <div className="progress mb-1" style={{ backgroundColor: index % 2 !== 0 ? 'white' : 'light-gray' }}>
-                <div className="progress-bar font-bold" role="progressbar" style={{ width: `${(row.participateNum / totalNum) * 100}%` }} aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                    {((row.participateNum / totalNum) * 100).toFixed(1)}%
-                </div>
-                </div>
               <Table size="small" aria-label="purchases">
                 <TableHead>
-                <TableRow className={index % 2 !== 0 ? 'bg-white rounded-lg' : 'bg-lightpink rounded-lg'}>
+                <TableRow className={index % 2 !== 0 ? 'bg-white rounded-lg' : 'bg-orange rounded-lg'}>
                     <TableCell align="center">활동명</TableCell>
                     <TableCell align="center">점수</TableCell>
                     <TableCell align="center">활동명</TableCell>
@@ -168,12 +162,12 @@ function Row(props) {
                   {row.history.map((historyRow, index) => (
                     <TableRow key={historyRow.date}>
                       <TableCell component="th" scope="row" align="center">
-                        {historyRow.date}
+                        축구
                       </TableCell>
-                      <TableCell align="center">{historyRow.customerId}</TableCell>
-                      <TableCell align="center">{historyRow.amount}</TableCell>
+                      <TableCell align="center">100</TableCell>
+                      <TableCell align="center">농구</TableCell>
                       <TableCell align="center">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
+                        80
                       </TableCell>
                     </TableRow>
                   ))}
@@ -218,7 +212,7 @@ Row.propTypes = {
                     color: 'white',
                 }}>
                 <TableCell />
-                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>등수</TableCell>
+                <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>순위</TableCell>
                 <TableCell align="center"style={{ color: 'white', fontWeight: 'bold' }}>조</TableCell>
                 <TableCell align="center" style={{ color: 'white', fontWeight: 'bold' }}>
                     <button onClick={handleSortByParticipateNum} style={{ color: 'white', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
