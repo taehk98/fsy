@@ -71,6 +71,18 @@ async function insertTeam(team) {
     }
 }
 
+async function deleteTeam(teamID) {
+    try {
+      const result = await scoresCollection.deleteOne({ _id: new ObjectId(teamID) });
+      if (result.deletedCount === 0) {
+        throw error;
+      }
+      return await initialScores();
+    } catch (error) {
+      throw error;
+    }
+  }
+
 // async function createUser(email, password, name, club) {
 //     // Hash the password before we insert it into the database
 //     const passwordHash = await bcrypt.hash(password, 10);
@@ -135,5 +147,6 @@ module.exports = {
     insertTeam,
     updateAttendances,
     replaceAttentances,
-    getAdmin
+    getAdmin,
+    deleteTeam
 };

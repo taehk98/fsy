@@ -3,8 +3,9 @@ import { UserContext } from '../App';
 import { lookInSession, storeInSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
 import './teams-management.css';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
-  MDBBtn,
   MDBCard,
   MDBCardBody,
   MDBCheckbox,
@@ -16,18 +17,23 @@ import {
   MDBRow,
   MDBTooltip,
 } from "mdb-react-ui-kit";
-import { m } from 'framer-motion';
 
 export function TeamList() {
     const [teamName, setTeamName] = useState('');
+    const [isAscending, setIsAscending] = useState(true);
+    const [checkedRows, setCheckedRows] = useState([]);
 
     const {
         userAuth: { access_token, scores },
         setUserAuth,
-      } = useContext(UserContext);
+    } = useContext(UserContext);
+
+    const [rows, setRows] = React.useState([
+        ...scores
+    ])
 
     // insert a team to scores
-    async function insertTeam(newTeam) {
+    async function insertTeam(newTeam, toastID) { 
         try {
             const response = await fetch('/api/insert-team', {
                 method: 'POST',
@@ -45,26 +51,29 @@ export function TeamList() {
                 const scoresAndToken = await response.json();
                 storeInSession('user', JSON.stringify(scoresAndToken));
                 setUserAuth(scoresAndToken);
+                setRows(scoresAndToken.scores);
+                setTeamName('');
                 toast.success('조를 추가했습니다.', {
+                    id: toastID,
                     duration: 2000, // 2초 동안 표시
-                });
+                });     
             }
         } catch (error) {
             toast.error('조를 추가하는데 실패했습니다.', {
-                duration: 3000, // 3초 동안 표시
+                id: toastID,
+                duration: 2000, // 3초 동안 표시
             });
         }
     }
 
-
     const addTeam = ( async () => {
+        let id = toast.loading("조를 추가중입니다.");
         let duplicatName = false;
         let error = false;
-
         scores.forEach(team => {
             if(team.teamName == teamName) {
                 toast.error('중복된 팀 아이디가 있습니다. \n다른 이름을 사용해주세요', {
-                    duration: 3000 // 1초 동안 표시
+                    duration: 2000 // 1초 동안 표시
                 });
                 duplicatName = true;
                 return;
@@ -74,7 +83,6 @@ export function TeamList() {
         if (duplicatName) {
             return; // 함수 종료
         }
-
         let activityList = [];
         let activitiesObject = {};
         await fetch(`/api/get-activityList`)
@@ -91,12 +99,11 @@ export function TeamList() {
             .catch(error => {
                 // 오류 처리
                 toast.error('활동리스트를 가져오는데 실패했습니다.', {
-                    duration: 3000 // 1초 동안 표시
+                    duration: 2000 // 1초 동안 표시
                 });
                 console.error('There was a problem with the fetch operation:', error);
                 error = true;
             });
-
         if (error) {
             return; // 함수 종료
         }
@@ -108,12 +115,188 @@ export function TeamList() {
         const newTeam = {
             teamName: teamName,
             totalScore: 0,
-            paticipateNum: 0,
+            participateNum: 0,
             activitities: activitiesObject
         }
 
-        await insertTeam(newTeam);
+        await insertTeam(newTeam, id);
     });
+
+    const deleteTeam = ( async (teamID, teamName) => {
+        const id = toast.loading(`${teamName}조를 삭제중입니다.`);
+        try {
+            const response = await fetch(`/api/delete-team/${teamID}` , {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('조 삭제에 실패했습니다.');
+            }
+            const scoresAndToken = await response.json();
+            storeInSession('user', JSON.stringify(scoresAndToken));
+            setUserAuth(scoresAndToken);
+            setRows(scoresAndToken.scores);
+            toast.success(`${teamName}조를 삭제했습니다`, {
+                id: id,
+                duration: 2000, // 2초 동안 표시
+            });    
+
+        }catch (error) {
+            toast.error('조 삭제에 실패했습니다.', {
+                id: id,
+                duration: 2000 // 1초 동안 표시
+            });
+            console.error('Error:', error);
+          }
+    });
+
+    const sortingList = () => {
+        var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+        if (isAscending) {
+            return [...rows].sort((a, b) => collator.compare(a.teamName, b.teamName));
+        } else {
+            return [...rows].sort((a, b) => collator.compare(b.teamName, a.teamName));
+        }
+    };
+    
+    const toggleSortOrder = () => {
+        setIsAscending(!isAscending);
+    };  
+
+    const handleCheckboxChange = (rowId) => {
+        // 체크박스가 체크되었는지 여부를 확인하고 상태를 업데이트합니다.
+        if (checkedRows.includes(rowId)) {
+            // 이미 체크된 경우 해당 rowId를 배열에서 제거합니다.
+            setCheckedRows(checkedRows.filter(id => id !== rowId));
+        } else {
+            // 체크되지 않은 경우 해당 rowId를 배열에 추가합니다.
+            setCheckedRows([...checkedRows, rowId]);
+        }
+    };
+
+    const deleteCheckedTeams = async () => {
+        const id = toast.loading(`선택된 조들을 삭제중입니다.`);
+        try {
+            const response = await fetch('/api/delete-multiple-teams' , {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(checkedRows),
+            });
+
+            if (!response.ok) {
+                throw new Error('선택된 항목을 삭제하는 데 실패했습니다.');
+            }
+            const scoresAndToken = await response.json();
+            storeInSession('user', JSON.stringify(scoresAndToken));
+            setUserAuth(scoresAndToken);
+            setRows(scoresAndToken.scores);
+            setCheckedRows([]);
+            toast.success(`선택된 조들을 삭제했습니다`, {
+                id: id,
+                duration: 2000, // 2초 동안 표시
+            });    
+
+        }catch (error) {
+            toast.error('선택된 항목을 삭제하는 데 실패했습니다.', {
+                id: id,
+                duration: 2000 // 1초 동안 표시
+            });
+          }
+    }
+
+    const confirmDeleteCheckedTeams = () => {
+        confirmAlert({
+            message: '선택된 팀들을 삭제하시겠습니까?',
+             buttons: [
+                {
+                label: '예',
+                onClick: () => deleteCheckedTeams(),
+                },
+                {
+                label: '아니오',
+                onClick: () => toast.dismiss(),
+                },
+            ],
+        });
+    };
+
+    const confirmDeleteTeam = (teamID, teamName) => {
+        confirmAlert({
+            message:  `${teamName}조를 삭제하시겠습니까?`,
+            buttons: [
+                {
+                    label: '예',
+                    onClick: () => deleteTeam(teamID, teamName),
+                },
+                {
+                    label: '아니오',
+                    onClick: () => toast.dismiss(),
+                },
+            ],
+        });    
+    }
+
+    const sortedList = sortingList();
+
+    function Row(props) {
+        const {row, index} = props;
+        return (
+            <MDBListGroup horizontal className="rounded-0 bg-transparent">
+                        <MDBListGroupItem className="d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
+                        <MDBCheckbox
+                            name="flexCheck"
+                            value=""
+                            id={`flexCheck-${index}`}
+                            onChange={() => handleCheckboxChange(row._id)} // 체크박스 클릭 시 이벤트 핸들러 추가
+                            checked={checkedRows.includes(row._id)} // 체크 상태 설정
+                        />
+                        </MDBListGroupItem>
+                        <MDBListGroupItem className="px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
+                        {" "}
+                        <p className="lead fw-normal mb-0">{row.teamName}조</p>
+                        </MDBListGroupItem>
+                        <MDBListGroupItem className="px-3 py-1 d-flex align-items-center border-0 bg-transparent pr-1">
+                        <div className="px-2 me-2 border-1 border-ppink rounded-3 d-flex align-items-center bg-light">
+                            <p className="medium mb-0">
+                            <MDBTooltip
+                                tag="a"
+                                wrapperProps={{ href: "#!" }}
+                                title="Due on date"
+                            >
+                            </MDBTooltip>
+                            ({row.participateNum}/20)
+                            
+                            </p>
+                        </div>
+                        </MDBListGroupItem>
+                        <MDBListGroupItem className="ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
+                        <div className="d-flex flex-row justify-content-end mb-1 mr-6 pr-2">
+                            {/* <MDBTooltip
+                                tag="a"
+                                wrapperProps={{ href: "#!" }}
+                                title="Edit todo"
+                            >
+                                <MDBIcon
+                                    fas
+                                    icon="pencil-alt"
+                                    className="me-3"
+                                    color="info"
+                                />
+                            </MDBTooltip> */}
+                            <MDBTooltip
+                                tag="a"
+                                wrapperProps={{ href: "#!" }}
+                                title="Delete todo"
+                            >
+                                <MDBIcon fas icon="trash-alt" color="danger" onClick={() => confirmDeleteTeam(row._id, row.teamName)}/>
+                            </MDBTooltip>
+                        </div>
+                </MDBListGroupItem>
+            </MDBListGroup>
+        )
+    };
 
     return (
         <>
@@ -141,7 +324,7 @@ export function TeamList() {
                                     value={teamName}
                                     onChange={(e) => setTeamName(e.target.value)}
                                 />
-                                <button onClick={addTeam} className="w-3/12 md:w-1/12 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                                <button onClick={() => addTeam()} className="w-3/12 md:w-1/12 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
                                     추가
                                 </button>
                             </div>
@@ -149,145 +332,37 @@ export function TeamList() {
                         </MDBCard>
                     </div>
                     <hr className="my-4" />
-
-                    <div className="d-flex justify-content-end align-items-center mb-4 pt-2 pb-3">
-                        <p className="small mb-0 me-2 text-muted">Filter</p>
-                        <MDBTooltip
-                        tag="a"
-                        wrapperProps={{ href: "#!" }}
-                        title="Ascending"
-                        >
-                        <MDBIcon
-                            fas
-                            icon="sort-amount-down-alt"
-                            className="ms-2"
-                            style={{ color: "#23af89" }}
-                        />
-                        </MDBTooltip>
-                    </div>
-
-
-                    <MDBListGroup horizontal className="rounded-0 bg-transparent">
-                        <MDBListGroupItem className="d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
-                        <MDBCheckbox
-                            name="flexCheck"
-                            value=""
-                            id="flexCheckChecked"
-                            defaultChecked
-                        />
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
-                        {" "}
-                        <p className="lead fw-normal mb-0">
-                            1조
-                        </p>
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
-                        <div className="d-flex flex-row justify-content-end mb-1 items-center">
-                            <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Edit todo"
-                            >
-                            <MDBIcon
-                                fas
-                                icon="pencil-alt"
-                                className="me-3"
-                                color="info"
-                            />
-                            </MDBTooltip>
-                            <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Delete todo"
-                            >
-                            <MDBIcon fas icon="trash-alt" color="danger" />
-                            </MDBTooltip>
-                        </div>
-                        </MDBListGroupItem>
-                    </MDBListGroup>
-
-                    <MDBListGroup horizontal className="rounded-0 bg-transparent">
-                        <MDBListGroupItem className="d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
-                        <MDBCheckbox name="flexCheck" value="" id="flexCheck" />
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
-                        {" "}
-                        <p className="lead fw-normal mb-0">2조</p>
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="px-3 py-1 d-flex align-items-center border-0 bg-transparent">
-                        <div className="px-2 me-2 border-1 border-ppink rounded-3 d-flex align-items-center bg-light">
-                            <p className="medium mb-0">
+                    <div className="d-flex align-items-center mb-2 pt-2 pb-1 justify-content-between">
+                        <div className='pl-0.5'>
                             <MDBTooltip
                                 tag="a"
                                 wrapperProps={{ href: "#!" }}
-                                title="Due on date"
+                                title="Delete todo"
                             >
-                            </MDBTooltip>
-                            (1/20)
-                            </p>
-                        </div>
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
-                        <div className="d-flex flex-row justify-content-end mb-1">
-                            <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Edit todo"
-                            >
-                            <MDBIcon
-                                fas
-                                icon="pencil-alt"
-                                className="me-3"
-                                color="info"
-                            />
-                            </MDBTooltip>
-                            <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Delete todo"
-                            >
-                            <MDBIcon fas icon="trash-alt" color="danger" />
+                                <MDBIcon fas icon="trash-alt" style={{ color: "#D982BA" }} onClick={() => confirmDeleteCheckedTeams()}/>
                             </MDBTooltip>
                         </div>
-                        </MDBListGroupItem>
-                    </MDBListGroup>
-
-
-                    <MDBListGroup horizontal className="rounded-0 bg-transparent ">
-                        <MDBListGroupItem className="d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent ">
-                        <MDBCheckbox name="flexCheck" value="" id="flexCheck" />
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
-                        {" "}
-                        <p className="lead fw-normal mb-0 w-100 ms-n2 ps-2 py-1 rounded">
-                            3조
-                        </p>
-                        </MDBListGroupItem>
-                        <MDBListGroupItem className="ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
-                        <div className="d-flex flex-row justify-content-end mb-1">
+                        <div className="d-flex align-items-center">
+                            <p className="small mb-0 me-4 text-muted">(참여/총활동)</p>
+                            <p className="small mb-0  text-muted">정렬</p>
                             <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Edit todo"
+                                tag="a"
+                                wrapperProps={{ href: "#!" }}
+                                title="Ascending"
                             >
-                            <MDBIcon
-                                fas
-                                icon="pencil-alt"
-                                className="me-3"
-                                color="info"
-                            />
-                            </MDBTooltip>
-                            <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Delete todo"
-                            >
-                            <MDBIcon fas icon="trash-alt" color="danger" />
+                                <MDBIcon
+                                    fas
+                                    icon="sort-amount-down-alt"
+                                    className="ms-2"
+                                    style={{ color: "#23af89" }}
+                                    onClick={() => toggleSortOrder()}
+                                />
                             </MDBTooltip>
                         </div>
-                        </MDBListGroupItem>
-                    </MDBListGroup>
+                    </div>
+                    {sortedList.map((team, index) => (
+                        <Row key={team.teamName} row={team} index={index}/>
+                    ))}
                     </MDBCardBody>
                 </MDBCard>
                 </MDBCol>

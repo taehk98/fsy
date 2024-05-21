@@ -25,6 +25,7 @@
     "framer-motion": "^11.1.8",
     "mdb-react-ui-kit": "^8.0.0",
     "react": "^18.2.0",
+    "react-confirm-alert": "^3.0.6",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.23.0",

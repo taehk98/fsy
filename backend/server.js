@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
+const { ObjectId } = require('mongodb');
 const { v4: uuidv4 } = require('uuid');
 const DB = require('./database.js');
 const cors = require('cors');
@@ -90,7 +91,7 @@ secureApiRouter.get('/get-activityList', async (req, res) => {
     const activities = await DB.getActivityList();
     
     res.send(activities);
-})
+});
 
 secureApiRouter.post('/insert-team', async (req, res) => {
     try {
@@ -100,7 +101,24 @@ secureApiRouter.post('/insert-team', async (req, res) => {
     } catch(err) {
         res.status(400)
     }
-})
+});
+
+secureApiRouter.delete('/delete-team/:id', async (req, res) => {
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).send('Invalid ID format');
+    }
+
+    try {
+        const scores = await DB.deleteTeam(id);
+        authToken = req.cookies[authCookieName];
+        res.status(200).send({scores: scores, access_token: authToken});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while trying to delete the document');
+    }
+});
 
 
 ///////////////////////////////////////////// manageyourclub below

@@ -54,7 +54,7 @@ const Navbar = () => {
   };
   return (
     <>
-      <nav className='navbar flex-items'  >
+      <nav className='navbar flex-items' >
       {access_token ? (
             <>
               <div
