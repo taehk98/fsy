@@ -70,10 +70,24 @@ apiRouter.post('/auth/login', async (req, res) => {
 });
 
   // DeleteAuth token if stored in cookie
-apiRouter.delete('/auth/logout', (_req, res) => {
+apiRouter.delete('/auth/logout', async (_req, res) => {
     res.clearCookie(authCookieName);
+    userID = null;
     res.status(204).end();
 });
+
+apiRouter.get('/get-scores', async (req, res) => {
+    try {
+        const scores = await DB.initialScores();
+        authToken = await req.cookies[authCookieName];
+        authToken = authToken ? authToken : null;
+        userID = userID ? userID : null;
+        res.status(200).send({ scores: scores, access_token: authToken, id: userID })
+    }
+    catch {
+        res.status(400).end();
+    }
+})
 
 // secureApiRouter verifies credentials for endpoints
 var secureApiRouter = express.Router();
@@ -99,7 +113,7 @@ secureApiRouter.post('/insert-team', async (req, res) => {
     try {
         authToken = req.cookies[authCookieName];
         const scores = await DB.insertTeam(req.body);
-        res.status(200).send({scores: scores , access_token: authToken , id: userID});
+        res.status(200).send({scores: scores , access_token: authToken , id: 'admin'});
     } catch(err) {
         res.status(400)
     }
@@ -115,7 +129,7 @@ secureApiRouter.delete('/delete-team/:id', async (req, res) => {
     try {
         const scores = await DB.deleteTeam(id);
         authToken = req.cookies[authCookieName];
-        res.status(200).send({scores: scores , access_token: authToken , id: userID});
+        res.status(200).send({scores: scores , access_token: authToken , id: 'admin'});
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred while trying to delete the document');
@@ -127,13 +141,34 @@ secureApiRouter.delete('/delete-multiple-teams', async (req, res) => {
     try{
         const scores = await DB.deleteMultipleTeams(teamIDs);
         authToken = req.cookies[authCookieName];
-        res.status(200).send({scores: scores, access_token: authToken , id: userID});
+        res.status(200).send({scores: scores, access_token: authToken , id: 'admin'});
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred while trying to delete the document');
     }
 })
 
+secureApiRouter.post('/insert-activity', async (req, res) => {
+    try {
+        authToken = req.cookies[authCookieName];
+        const activityList = await DB.insertActivity(req.body.activityName);
+        res.status(200).send({access_token: authToken , id: 'admin', activityList: activityList });
+    } catch(err) {
+        res.status(400).send(err.message);
+    }
+});
+
+secureApiRouter.delete('/delete-activity/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const activityList = await DB.deleteActivity(id);
+        authToken = req.cookies[authCookieName];
+        res.status(200).send({activityList: activityList , access_token: authToken , id: 'admin'});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while trying to delete the document');
+    }
+});
 
 ///////////////////////////////////////////// manageyourclub below
 

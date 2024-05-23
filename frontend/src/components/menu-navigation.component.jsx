@@ -29,7 +29,7 @@ const MenuNavigationPanel = () => {
             <Link to='/team' className='flex gap-2 link pl-8 py-3 text-black'>
               <p>조 관리</p>
             </Link>
-            <Link to='/editor' className='flex gap-2 link pl-8 py-3 text-black'>
+            <Link to='/activity' className='flex gap-2 link pl-8 py-3 text-black'>
               <p>활동 관리</p>
             </Link>
           </>
