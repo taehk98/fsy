@@ -90,9 +90,13 @@ if (user) {
 });
 
 secureApiRouter.get('/get-activityList', async (req, res) => {
-    const activities = await DB.getActivityList();
-    
-    res.send(activities);
+    try {
+        const activities = await DB.getActivityList();
+        res.status(200).send(activities);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
+        res.status(500).send({ msg: 'Failed to fetch activities' });
+    }
 });
 
 secureApiRouter.post('/insert-team', async (req, res) => {
@@ -138,14 +142,33 @@ secureApiRouter.put('/update-score-by-activity', async (req, res) => {
     try {
         const { activityId, teamId, newScore } = req.body;
         console.log(typeof teamId)
-        if (!activityId || !teamId || typeof newScore !== 'number') {
-            return res.status(400).send({ msg: 'Invalid input data' });
-        }
+        // if (!activityId || !teamId || typeof newScore !== 'number') {
+        //     return res.status(400).send({ msg: 'Invalid input data' });
+        // }
         const updatedScores = await DB.updateScoresByActivity(activityId, teamId, newScore);
         res.status(200).send(updatedScores);
     } catch (err) {
         console.error('Error updating score by activity:', err);
         res.status(500).send({ msg: 'Failed to update score' });
+    }
+});
+
+secureApiRouter.get('/teams', async (req, res) => {
+    try {
+        const teams = await DB.getTeamNamesFromScores();
+        res.status(200).send(teams);
+    } catch (error) {
+        console.error('Error fetching team names:', error);
+        res.status(500).send({ msg: 'Failed to fetch team names' });
+    }
+});
+secureApiRouter.get('/get-activities', async (req, res) => {
+    try {
+        const activities = await DB.getActivities();
+        res.status(200).send(activities);
+    } catch (error) {
+        console.error('Error fetching team names:', error);
+        res.status(500).send({ msg: 'Failed to fetch team names' });
     }
 });
 
