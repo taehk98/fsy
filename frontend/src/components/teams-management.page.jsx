@@ -58,7 +58,7 @@ export function TeamList() {
                 setTeamName('');
                 toast.success('조를 추가했습니다.', {
                     id: toastID,
-                    duration: 2000, // 2초 동안 표시
+                    duration: 1000, // 2초 동안 표시
                 });     
             }
         } catch (error) {
@@ -76,6 +76,7 @@ export function TeamList() {
         scores.forEach(team => {
             if(team.teamName == teamName) {
                 toast.error('중복된 팀 아이디가 있습니다. \n다른 이름을 사용해주세요', {
+                    id: id,
                     duration: 2000 // 1초 동안 표시
                 });
                 duplicatName = true;
@@ -101,7 +102,8 @@ export function TeamList() {
             })
             .catch(error => {
                 // 오류 처리
-                toast.error('활동리스트를 가져오는데 실패했습니다.', {
+                toast.error('조 추가에 실패했습니다', {
+                    id: id,
                     duration: 2000 // 1초 동안 표시
                 });
                 console.error('There was a problem with the fetch operation:', error);

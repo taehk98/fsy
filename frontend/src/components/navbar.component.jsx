@@ -27,6 +27,7 @@ const Navbar = () => {
             setUserAuth({ access_token: null });
             window.location.href = '/';
             removeFromSession('user');   
+            removeFromSession('data');
         }, 1000);
     };
 

@@ -148,6 +148,18 @@ secureApiRouter.delete('/delete-multiple-teams', async (req, res) => {
     }
 })
 
+secureApiRouter.delete('/delete-multiple-activities', async (req, res) => {
+    const activityNames = req.body;
+    try{
+        const activityList = await DB.deleteMultipleActivities(activityNames);
+        authToken = req.cookies[authCookieName];
+        res.status(200).send({activityList: activityList , access_token: authToken , id: 'admin'});
+    }catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while trying to delete the document');
+    }
+})
+
 secureApiRouter.post('/insert-activity', async (req, res) => {
     try {
         authToken = req.cookies[authCookieName];

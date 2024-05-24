@@ -123,6 +123,37 @@ async function deleteActivity(activityName) {
     } catch (error) {
         throw new Error('활동 삭제에 실패했습니다.');
     }
+}
+
+async function deleteMultipleActivities(activityNames) {
+    try {
+        for (let i = 0; i < activityNames.length; i++) {
+            
+            let result = await scoresCollection.updateMany(
+                { "activities": { $exists: true } }, // Ensure activities field exists
+                { $unset: { [`activities.${activityNames[i]}`]: "" } }
+            );
+
+            if (result.modifiedCount === 0) {
+                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
+            }
+
+            result = await activityListCollection.updateOne(
+                { _id: new ObjectId("664986b19214e7b98f93f3de") },
+                {
+                    $pull: {
+                        activities: activityNames[i]
+                    }
+                }
+            );
+            if (result.modifiedCount === 0) {
+                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
+            }
+        }
+      return await getActivityList();
+    } catch (error) {
+        throw new Error('활동 삭제에 실패했습니다.');
+    }
   }
 
 async function deleteTeam(teamID) {
@@ -243,5 +274,6 @@ module.exports = {
     deleteTeam,
     deleteMultipleTeams,
     insertActivity,
-    deleteActivity
+    deleteActivity,
+    deleteMultipleActivities
 };

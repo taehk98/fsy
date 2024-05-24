@@ -44,7 +44,7 @@ export function CollapsibleTable() {
                 setRows(scoresAndTokenAndId.scores);
                 toast.success('순위를 가져왔습니다.', {
                     id: id,
-                    duration: 2000, // 2초 동안 표시
+                    duration: 1000, // 2초 동안 표시
                 });     
             }
         } catch (error) {
@@ -56,9 +56,8 @@ export function CollapsibleTable() {
     }
 
     useEffect(()=> {
-        if(!scores) {
-            fetchData()
-        }
+        fetchData()
+        // 저장한거 쓰려면 !scores일때만 하게 하면됨
     }, [])
 
     const newDataArray = [];
@@ -73,12 +72,6 @@ export function CollapsibleTable() {
         }
     }, [scores])
 
-    // const totalNum = scores ? Object.keys(scores[0]['activities']).length : 20;
-    // const newDataArray = [];
-    // for (const scoreObj of Object.values(scores)) {
-    //     const { teamName, participateNum, totalScore, activities } = scoreObj;
-    //     newDataArray.push(createData(teamName, participateNum, totalScore, activities));
-    // }
     const [totalNum, setTotalNum] = useState(20);
     const [rows, setRows] = useState(newDataArray);
     const [sortByTotalScore, setSortByTotalScore] = useState(null);
@@ -87,9 +80,7 @@ export function CollapsibleTable() {
     const [clicked, setClicked] = useState(null);
         
     const handleSortByTotalScore = () => {
-        console.log(rows);
         const sortedRows = [...rows].sort((a, b) => b.totalScore - a.totalScore);
-        console.log(sortedRows);
         setRows(sortByTotalScore ? sortedRows.reverse() : sortedRows);
         setSortByTotalScore(!sortByTotalScore);
         setSortByParticipateNum(null);
@@ -134,7 +125,6 @@ function Row(props) {
     let ranking;
     let currScore;
     if(clicked === 'totalScore') {
-        console.log(rows[index])
         currScore = rows[index].totalScore;
         if (rankingOrder === false) {
             ranking = index + 1;

@@ -38,7 +38,6 @@ export function ActivityList() {
             })
             .then(data => {
                 // 받아온 데이터를 처리
-                console.log(data);
                 setActivityList(data[0].activities);
             })
             .catch(error => {
@@ -60,7 +59,6 @@ export function ActivityList() {
 
     // insert an activity
     async function insertActivity(toastID) { 
-        console.log(activityName);
         try {
             const response = await fetch(`/api/insert-activity`, {
                 method: 'POST',
@@ -163,7 +161,7 @@ export function ActivityList() {
 
     const handleCheckboxChange = (rowActivityName) => {
         // 체크박스가 체크되었는지 여부를 확인하고 상태를 업데이트합니다.
-        if (checkedRows.includes(rowId)) {
+        if (checkedRows.includes(rowActivityName)) {
             // 이미 체크된 경우 해당 rowId를 배열에서 제거합니다.
             setCheckedRows(checkedRows.filter(activity => activity !== rowActivityName));
         } else {
@@ -173,9 +171,9 @@ export function ActivityList() {
     };
 
     const deleteCheckedActivities = async () => {
-        const id = toast.loading(`선택된 조들을 삭제중입니다.`);
+        const id = toast.loading(`선택된 활동들을 삭제중입니다.`);
         try {
-            const response = await fetch('/api/delete-multiple-teams' , {
+            const response = await fetch('/api/delete-multiple-activities' , {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,14 +182,14 @@ export function ActivityList() {
             });
 
             if (!response.ok) {
-                throw new Error('선택된 항목을 삭제하는 데 실패했습니다.');
+                throw new Error('선택된 항목을 삭제하는데 실패했습니다.');
             }
             const scoresAndTokenAndId = await response.json();
             storeInSession('user', JSON.stringify(scoresAndTokenAndId));
             setUserAuth(scoresAndTokenAndId);
-            setRows(scoresAndTokenAndId.scores);
+            setActivityList(scoresAndTokenAndId.activityList[0].activities);
             setCheckedRows([]);
-            toast.success(`선택된 조들을 삭제했습니다`, {
+            toast.success(`선택된 활동들을 삭제했습니다`, {
                 id: id,
                 duration: 2000, // 2초 동안 표시
             });    
