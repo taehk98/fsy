@@ -140,12 +140,8 @@ secureApiRouter.delete('/delete-multiple-teams', async (req, res) => {
 
 secureApiRouter.put('/update-score-by-activity', async (req, res) => {
     try {
-        const { activityId, teamId, newScore } = req.body;
-        console.log(typeof teamId)
-        // if (!activityId || !teamId || typeof newScore !== 'number') {
-        //     return res.status(400).send({ msg: 'Invalid input data' });
-        // }
-        const updatedScores = await DB.updateScoresByActivity(activityId, teamId, newScore);
+        const { activityId, teamName, newScore } = req.body;
+        const updatedScores = await DB.updateScoresByActivity(activityId, teamName, newScore);
         res.status(200).send(updatedScores);
     } catch (err) {
         console.error('Error updating score by activity:', err);
@@ -167,8 +163,40 @@ secureApiRouter.get('/get-activities', async (req, res) => {
         const activities = await DB.getActivities();
         res.status(200).send(activities);
     } catch (error) {
-        console.error('Error fetching team names:', error);
-        res.status(500).send({ msg: 'Failed to fetch team names' });
+        console.error('Error fetching activities:', error);
+        res.status(500).send({ msg: 'Failed to fetch activities' });
+    }
+});
+secureApiRouter.get('/get-numActivity', async (req, res) => {
+    try {
+        const numActivity = await DB.getNumActsFromScores();
+        res.status(200).send(numActivity);
+    } catch (error) {
+        console.error('Error fetching participateNum:', error);
+        res.status(500).send({ msg: 'Failed to fetch participateNum' });
+    }
+});
+secureApiRouter.get('/get-score-and-participation', async (req, res) => {
+    try {
+        const { teamName, activityId } = req.query;
+
+        if (!teamName || !activityId) {
+            return res.status(400).send({ msg: 'Invalid input data' });
+        }
+
+        const team = await DB.getTeam(teamName);
+        console.log(team)
+        if (!team) {
+            return res.status(404).send({ msg: 'Team not found' });
+        }
+
+        const score = team.activities[activityId] || 0;
+        const participateNum = team.participateNum || 0; // Assuming participateNum is stored at the team level
+
+        res.status(200).send({ score, participateNum });
+    } catch (err) {
+        console.error('Error fetching score and participation:', err);
+        res.status(500).send({ msg: 'Failed to fetch score and participation' });
     }
 });
 

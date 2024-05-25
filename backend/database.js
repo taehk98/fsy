@@ -52,6 +52,10 @@ async function getAdmin(userId) {
     return await userCollection.findOne({ id: userId });
 }
 
+async function getTeam(teamName) {
+    return await scoresCollection.findOne({ teamName: teamName });
+  }
+
 async function getActivityList() {
     try {
         const activities = await activityListCollection.find({}).toArray();
@@ -183,32 +187,32 @@ async function replaceAttentances(newAttendances, attendances) {
     return attendances;
 }
 
-async function updateScoresByActivity(activityId, teamId, newScore) {
-    // console.log(teamId)
+async function updateScoresByActivity(activityId, teamName, newScore) {
     try {
-        const team = await scoresCollection.findOne({ teamName: teamId });
-        // console.log(team)
+        const team = await scoresCollection.findOne({ teamName: teamName });
         if (!team) {
             throw new Error('Team not found');
         }
 
         // Update the activity score
         team.activities[activityId] = Number(newScore);
-        team.totalScore = 0
+        team.totalScore = 0;
+        team.participateNum = 0;
         // console.log(team.activities)
         for(const activity in team.activities) {
-            console.log(team.activities[activity])
+            if(team.activities[activity] !== 0){
+                team.participateNum += 1;
+            }
             team.totalScore += Number(team.activities[activity]);
         }
 
         // Recalculate total score
         // team.totalScore = String(team.totalScore);
-        console.log(team.totalScore)
 
         // Update the document in the database
         await scoresCollection.updateOne(
-            { teamName: teamId },
-            { $set: { activities: team.activities, totalScore: team.totalScore } } // Number(team.activities)
+            { teamName: teamName },
+            { $set: { activities: team.activities, totalScore: team.totalScore, participateNum:team.participateNum }, }
         );
 
         // Return the updated scores
@@ -240,14 +244,25 @@ async function getActivities() {
         throw error;
     }
 }
+async function getNumActsFromScores() {
+    try {
+        const participateNum = await scoresCollection.distinct('participateNum');
+        return participateNum.map(participateNum => ({ participateNum })); // Adjust the format if needed
+    } catch (error) {
+        console.error('Error fetching team names from scores:', error);
+        throw error;
+    }
+}
 
 module.exports = {
     getUser,
     getUserByToken,
+    getTeam,
     setAdminToken,
     getActivityList,
     getTeamNamesFromScores,
     getActivities,
+    getNumActsFromScores,
     initialScores,
     insertTeam,
     updateScoresByActivity,
