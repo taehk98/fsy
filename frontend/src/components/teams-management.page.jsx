@@ -116,12 +116,15 @@ export function TeamList() {
         activityList[0].activities.forEach(activity => {
             activitiesObject[activity] = 0;
         });
+
+        let snack = [false, false, false, false, false];
         
         const newTeam = {
             teamName: teamName,
             totalScore: 0,
             participateNum: 0,
-            activities: activitiesObject
+            activities: activitiesObject,
+            snack: snack
         }
 
         await insertTeam(newTeam, id);
@@ -308,8 +311,8 @@ export function TeamList() {
     return (
         <>
         {access_token && (
-            <MDBContainer className="py-2 ">
-            <MDBRow className="d-flex justify-content-center align-items-center h-100">
+            <MDBContainer className="py-2 overflow-y-auto" style={{ height: 'calc(100vh - 80px)' }}>
+            <MDBRow className="d-flex justify-content-center align-items-center">
                 <MDBCol>
                 <MDBCard
                     id="list1"

@@ -283,8 +283,8 @@ export function ActivityList() {
     return (
         <>
         {access_token && (
-            <MDBContainer className="py-2 ">
-            <MDBRow className="d-flex justify-content-center align-items-center h-100">
+            <MDBContainer className="py-2 overflow-y-auto" style={{ height: 'calc(100vh - 80px)' }}>
+            <MDBRow className="d-flex justify-content-center align-items-center">
                 <MDBCol>
                 <MDBCard
                     id="list1"
