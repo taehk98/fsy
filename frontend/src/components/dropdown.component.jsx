@@ -31,7 +31,7 @@ const Dropdown = ({ endpoint, placeholder, onChange }) => {
 
   return (
     <Select
-      className="basic-single"
+      className="basic-single w-full h-full"
       classNamePrefix="select"
       isSearchable={true}
       placeholder={placeholder}

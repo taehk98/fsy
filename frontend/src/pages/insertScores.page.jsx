@@ -27,7 +27,6 @@ const InsertScores = () => {
   async function fetchScoreAndParticipation() {
     try {
       const response = await fetch(`/api/get-score-and-participation?teamName=${teamName}&activityId=${activityId}`);
-      console.log(teamName, activityId);
       if (response.ok) {
         const data = await response.json();
         setCurrentScore(data.score);
@@ -87,51 +86,51 @@ const InsertScores = () => {
   return (
     <>
       {access_token && (
-        <MDBContainer className="py-2">
+        <MDBContainer className="py-2 h-full">
           <MDBRow className="d-flex justify-content-center align-items-center">
-            <MDBCol>
-              <MDBCard id="list1" style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="h-full">
+            <MDBCol className="w-full">
+              <MDBCard id="list1" style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="h-fit w-full">
                 <MDBCardBody className="py-2 px-3 px-md-5">
                   <p className="text-center py-2">
                     <u className='font-bold text-3xl no-underline'>점수 및 간식 관리</u>
                   </p>
                   <div className="pb-1">
-                    <MDBCard>
+                    <MDBCard className="w-full">
                       <MDBCardBody>
-                        <div className="d-flex flex-row align-items-center">
+                        <div className="d-flex flex-column align-items-center w-full">
                           <Dropdown
                             endpoint="/api/teams"
                             placeholder="팀을 선택하세요"
                             onChange={(selectedOption) => setTeamName(selectedOption.value)}
                           />
                         </div>
-                        <div className="d-flex flex-row align-items-center mt-2">
+                        <div className="d-flex flex-column align-items-center mt-2 w-full">
                           <Dropdown
                             endpoint="/api/get-activities"
                             placeholder="활동을 선택하세요"
                             onChange={(selectedOption) => setActivityId(selectedOption.value)}
                           />
                         </div>
-                        <div className="d-flex flex-row align-items-center mt-2">
-                          <button onClick={fetchScoreAndParticipation} className="bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                        <div className="d-flex flex-column align-items-center mt-2 w-full">
+                          <button onClick={fetchScoreAndParticipation} className="w-full bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
                             조회
                           </button>
                         </div>
                         {currentScore !== null && (
-                          <div className="mt-2">
+                          <div className="mt-2 text-center w-full">
                             <p>현재 점수: {currentScore}</p>
-                            <p>참여 활동 수: {participateNum}</p>
+                            <p>참여 인원 수: {participateNum}</p>
                           </div>
                         )}
-                        <div className="d-flex flex-row align-items-center mt-2 border rounded">
+                        <div className="d-flex flex-column align-items-center mt-2 w-full">
                           <input
                             type="number"
-                            className="form-control form-control-lg w-9/12 md:w-11/12"
+                            className="form-control form-control-lg w-full border"
                             placeholder="점수를 입력하세요"
                             value={score}
                             onChange={(e) => setScore(e.target.value)}
                           />
-                          <button onClick={handleAddScore} className="w-3/12 md:w-1/12 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                          <button onClick={handleAddScore} className="w-full bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 mt-2">
                             추가
                           </button>
                         </div>
