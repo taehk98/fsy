@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React , { useContext, useState, useEffect } from 'react';
+import { UserContext } from '../App';
+import { Toaster, toast } from 'react-hot-toast';
+import { storeInSession, lookInSession } from '../common/session';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -15,26 +20,71 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export function CollapsibleTable() {
+    // const {
+    //     userAuth: { access_token, scores },
+    //     setUserAuth,
+    // } = useContext(UserContext);
+    const [scores, setScores] = useState(() => {
+        return JSON.parse(lookInSession('data')); 
+    });
 
-    const totalNum = 30;
+    async function fetchData() {
+        let id = toast.loading("순위를 가져오는중입니다...");
+        try {
+            const response = await fetch('/api/get-scores');
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            if (response.status === 200) {
+                const scoresAndTokenAndId = await response.json();
+                storeInSession('data', JSON.stringify(scoresAndTokenAndId.scores));
+                setScores(scoresAndTokenAndId.scores)
+                setRows(scoresAndTokenAndId.scores);
+                toast.success('순위를 가져왔습니다.', {
+                    id: id,
+                    duration: 1000, // 2초 동안 표시
+                });     
+            }
+        } catch (error) {
+            toast.error('점수를 불러오는데 실패했습니다.', {
+                id: id,
+                duration: 2000, // 3초 동안 표시
+            });
+        }
+    }
 
-    const [rows, setRows] = React.useState([
-        createData(2, 1, 6.0, 24, 4.0),
-        createData(1, 2, 9.0, 37, 4.3),
-        createData(3, 3, 16.0, 24, 6.0),
-        createData(4, 4, 3.7, 67, 4.3),
-        createData(5, 5, 16.0, 49, 3.9),
-      ]);
+    useEffect(()=> {
+        fetchData()
+        // 저장한거 쓰려면 !scores일때만 하게 하면됨
+    }, [])
 
-    const [sortByTotalScore, setSortByTotalScore] = React.useState(null);
-    const [sortByParticipateNum, setSortByParticipateNum] = React.useState(null);
-    const [rankingOrder, setRankingOrder] = React.useState(null);
+    const newDataArray = [];
 
+    useEffect(() => {
+        if(scores !== undefined && scores !== null){
+            for (const scoreObj of Object.values(scores)) {
+                const { teamName, participateNum, totalScore, activities } = scoreObj;
+                newDataArray.push(createData(teamName, participateNum, totalScore, activities));
+            }
+            setTotalNum(Object.keys(scores[0]['activities']).length);
+        }
+    }, [scores])
+
+    const [totalNum, setTotalNum] = useState(20);
+    const [rows, setRows] = useState(newDataArray);
+    const [sortByTotalScore, setSortByTotalScore] = useState(null);
+    const [sortByParticipateNum, setSortByParticipateNum] = useState(null);
+    const [rankingOrder, setRankingOrder] = useState(null);
+    const [clicked, setClicked] = useState(null);
+        
     const handleSortByTotalScore = () => {
         const sortedRows = [...rows].sort((a, b) => b.totalScore - a.totalScore);
         setRows(sortByTotalScore ? sortedRows.reverse() : sortedRows);
         setSortByTotalScore(!sortByTotalScore);
         setSortByParticipateNum(null);
+        setClicked('totalScore');
         if(sortByTotalScore) {
             setRankingOrder(true);
         } else {
@@ -47,6 +97,7 @@ export function CollapsibleTable() {
         setRows(sortByParticipateNum ? sortedRows.reverse() : sortedRows);
         setSortByParticipateNum(!sortByParticipateNum);
         setSortByTotalScore(null);
+        setClicked('participateNum');
         if(sortByParticipateNum) {
             setRankingOrder(true);
         } else {
@@ -59,67 +110,69 @@ export function CollapsibleTable() {
         handleSortByTotalScore();
     }, []);
 
-    function createData(rank, teamNumber, participateNum, totalScore, price) {
+    function createData(teamName, participateNum, totalScore, activities) {
     return {
-        rank,
-        teamNumber,
+        teamName,
         participateNum,
         totalScore,
-        price,
-        history: [
-        {
-            date: '2020-01-05',
-            customerId: '11091700',
-            amount: 3,
-        },
-        {
-            date: '2020-01-02',
-            customerId: 'Anonymous',
-            amount: 1,
-        },
-        ],
+        activities
     };
     }
 
 function Row(props) {
-  const { row, index } = props;
-  const [open, setOpen] = React.useState(false);
-//   if(index > 0 && rows[index].totalScore !== rows[index-1].totalScore) {
-    //     setRankingOnTotal(index);
-    //   }
-    //   console.log(rankingOrder);
-    //   console.log(index);
-    //   console.log(row.totalScore);
-    //   console.log(clicked);
-    //   let ranking;
-    //   if(clicked === 'totalScore') {
-    //     if (rankingOrder === false) {
-    //         for(let i = index; i > 0; i--) {
-    //             if (rows[i].totalScore === rows[i-1].totalScore) {
-    //                 ranking = i;
-    //             } else {
-    //                 if(ranking == index-1) {
-    //                     ranking = index;
-    //                 }
-    //                 break;
-    //             }
-    //         }
-    //         if(index === 0) {
-    //             ranking = 1;
-    //         }
-    //     } else if (rankingOrder === true) {
-    //         for(let i = index; i > 0; i--) {
-    //             if (rows[i].totalScore === rows[i-1].totalScore) {
-    //                 ranking = i;
-    //             } else {
-    //                 break;
-    //             }
-    //         }
-    //         if(index === 0) {
-    //             ranking = rows.length;
-    //         }
-    //     }
-    //   }
+    const { row, index } = props;
+    const [open, setOpen] = React.useState(false);
+    let ranking;
+    let currScore;
+    if(clicked === 'totalScore') {
+        currScore = rows[index].totalScore;
+        if (rankingOrder === false) {
+            ranking = index + 1;
+            for(let i = index; i > 0; i--) {
+                if (currScore === rows[i-1].totalScore) {
+                    ranking = i;
+                } else {   
+                    break;
+                }
+            }
+            if(index === 0) {
+                ranking = 1;
+            }
+        } else if (rankingOrder === true) {
+            ranking = rows.length - index;
+            for(let i = index; i < rows.length -1; i++) {
+                if (currScore === rows[i + 1].totalScore) {
+                    ranking = ranking - 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    } else if (clicked === 'participateNum') {
+        currScore = rows[index].participateNum;
+        if (rankingOrder === false) {
+            ranking = index + 1;
+            for(let i = index; i > 0; i--) {
+                if (currScore === rows[i-1].participateNum) {
+                    ranking = i;
+                } else {   
+                    break;
+                }
+            }
+            if(index === 0) {
+                ranking = 1;
+            }
+        } else if (rankingOrder === true) {
+            ranking = rows.length - index;
+            for(let i = index; i < rows.length -1; i++) {
+                if (currScore === rows[i + 1].participateNum) {
+                    ranking = ranking - 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
   return (
     <React.Fragment>
         <TableRow style={{
@@ -136,9 +189,9 @@ function Row(props) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" align="center" >
-            {rankingOrder ? (rows.length - index) : (index + 1) }등
+             {ranking}등
         </TableCell>
-        <TableCell align="center" >{row.teamNumber}조</TableCell>
+        <TableCell align="center" >{row.teamName}조</TableCell>
         <TableCell align="center" >{row.participateNum} / {totalNum}</TableCell>
         <TableCell align="center" >{row.totalScore}점</TableCell>
       </TableRow>
@@ -159,18 +212,29 @@ function Row(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.history.map((historyRow, index) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row" align="center">
-                        축구
-                      </TableCell>
-                      <TableCell align="center">100</TableCell>
-                      <TableCell align="center">농구</TableCell>
-                      <TableCell align="center">
-                        80
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                {row.activities && Object.entries(row.activities).map(([activityName, score], index) => (
+                    index % 2 === 0 ? (
+                        // 짝수 번째 활동인 경우
+                        <TableRow key={index}>
+                            <TableCell component="th" scope="row" align="center">
+                                {activityName}
+                            </TableCell>
+                            <TableCell align="center">{score}</TableCell>
+                            {/* 다음 홀수 번째 활동이 있는지 확인하고 있으면 렌더링 */}
+                            {index + 1 < Object.entries(row.activities).length && (
+                                <TableCell component="th" scope="row" align="center">
+                                    {Object.entries(row.activities)[index + 1][0]}
+                                </TableCell>
+                            )}
+                            {/* 다음 홀수 번째 활동의 점수가 있는지 확인하고 있으면 렌더링 */}
+                            {index + 1 < Object.entries(row.activities).length && (
+                                <TableCell align="center">
+                                    {Object.entries(row.activities)[index + 1][1]}
+                                </TableCell>
+                            )}
+                        </TableRow>
+                    ) : null
+                ))}
                 </TableBody>
               </Table>
             </Box>
@@ -181,27 +245,12 @@ function Row(props) {
   );
 }
 
-Row.propTypes = {
-  row: PropTypes.shape({
-    teamNumber: PropTypes.number.isRequired,
-    totalScore: PropTypes.number.isRequired,
-    participateNum: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    rank: PropTypes.number.isRequired,
-    price: PropTypes.number.isRequired,
-  }).isRequired,
-};
-
   return (
-    <>
-        <div className='text-2xl rounded font-semibold text-center py-2 bg-pink-100 mx-2'>
-        실시간 순위표
+    <>  
+        <Toaster/>
+        <div className='text-2xl rounded font-bold text-center py-2 bg-pink-100 mx-2 flex justify-center relative'>
+            <span >실시간 순위표</span>
+            <FontAwesomeIcon icon={faArrowsRotate} onClick={fetchData} className="absolute right-0 top-1/2 transform -translate-y-1/2 pr-2" />
         </div>
         <div className='mx-2'>
         <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%' }} >
@@ -230,7 +279,7 @@ Row.propTypes = {
             </TableHead>
             <TableBody>
             {rows.map((row, index) => (
-                <Row key={row.teamNumber} row={row} index={index} length={rows.length}/>
+                <Row key={`${row.teamName}-${index}`} row={row} index={index} length={rows.length}/>
             ))}
             </TableBody>
         </Table>

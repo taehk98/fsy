@@ -82,6 +82,91 @@ async function insertTeam(team) {
     }
 }
 
+async function insertActivity(activityName) {
+    try {
+        const updateResult = await scoresCollection.updateMany(
+            {},
+            {
+                $set: { [`activities.${activityName}`]: 0}
+            }
+        )
+        console.log('Update Result:', updateResult);
+        console.log(`Matched ${updateResult.matchedCount} documents and modified ${updateResult.modifiedCount} documents.`);
+        const insertResult = await activityListCollection.updateOne(
+            { _id: new ObjectId("664986b19214e7b98f93f3de") },
+            {
+              $push: {
+                activities: activityName
+              }
+            }
+        );
+        return await getActivityList();
+    } catch (error) {
+        console.error('Error updating documents:', error);
+    }
+}
+
+async function deleteActivity(activityName) {
+    try {
+        let result = await scoresCollection.updateMany(
+            { "activities": { $exists: true } }, // Ensure activities field exists
+            { $unset: { [`activities.${activityName}`]: "" } }
+        );
+
+        if (result.modifiedCount === 0) {
+            console.log("here");
+            throw new Error(`activities 필드를 못찾았습니다: ${activityName}`);
+        }
+
+        result = await activityListCollection.updateOne(
+            { _id: new ObjectId("664986b19214e7b98f93f3de") },
+            {
+                $pull: {
+                    activities: activityName
+                }
+            }
+        );
+        if (result.modifiedCount === 0) {
+            console.log("here");
+            throw new Error(`activities 필드를 못찾았습니다: ${activityName}`);
+        }
+      return await getActivityList();
+    } catch (error) {
+        throw new Error('활동 삭제에 실패했습니다.');
+    }
+}
+
+async function deleteMultipleActivities(activityNames) {
+    try {
+        for (let i = 0; i < activityNames.length; i++) {
+            
+            let result = await scoresCollection.updateMany(
+                { "activities": { $exists: true } }, // Ensure activities field exists
+                { $unset: { [`activities.${activityNames[i]}`]: "" } }
+            );
+
+            if (result.modifiedCount === 0) {
+                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
+            }
+
+            result = await activityListCollection.updateOne(
+                { _id: new ObjectId("664986b19214e7b98f93f3de") },
+                {
+                    $pull: {
+                        activities: activityNames[i]
+                    }
+                }
+            );
+            if (result.modifiedCount === 0) {
+                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
+            }
+        }
+      return await getActivityList();
+    } catch (error) {
+        throw new Error('활동 삭제에 실패했습니다.');
+    }
+  }
+
 async function deleteTeam(teamID) {
     try {
       const result = await scoresCollection.deleteOne({ _id: new ObjectId(teamID) });
@@ -270,5 +355,8 @@ module.exports = {
     replaceAttentances,
     getAdmin,
     deleteTeam,
-    deleteMultipleTeams
+    deleteMultipleTeams,
+    insertActivity,
+    deleteActivity,
+    deleteMultipleActivities
 };
