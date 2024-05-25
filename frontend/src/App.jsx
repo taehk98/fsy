@@ -13,6 +13,7 @@ import {ActivityList} from './components/activities-management.page.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import InsertScores from './pages/insertScores.page.jsx';
 
 
 export const UserContext = createContext({});
@@ -40,6 +41,7 @@ function App() {
             <Route path='/rank' element={<CollapsibleTable />} />
             <Route path='/team' element={<TeamList/>}/>
             <Route path='/activity' element={<ActivityList/>}/>
+            <Route path='/insertScores' element={<InsertScores/>}/>
             <Route path='*' element={<PageNotFound />} />
           </Route>
         </Routes>

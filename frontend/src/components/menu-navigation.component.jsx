@@ -34,7 +34,7 @@ const MenuNavigationPanel = () => {
             </Link>
           </>
         )}
-        <Link to='/editor' className='flex gap-2 link pl-8 py-3 text-black'>
+        <Link to='/insertScores' className='flex gap-2 link pl-8 py-3 text-black'>
           <p>점수 기입</p>
         </Link>
         <span className='absolute border-t border-grey w-[100%]'></span>

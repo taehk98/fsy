@@ -104,9 +104,13 @@ if (user) {
 });
 
 secureApiRouter.get('/get-activityList', async (req, res) => {
-    const activities = await DB.getActivityList();
-    
-    res.send(activities);
+    try {
+        const activities = await DB.getActivityList();
+        res.status(200).send(activities);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
+        res.status(500).send({ msg: 'Failed to fetch activities' });
+    }
 });
 
 secureApiRouter.post('/insert-team', async (req, res) => {
@@ -147,6 +151,68 @@ secureApiRouter.delete('/delete-multiple-teams', async (req, res) => {
         res.status(500).send('An error occurred while trying to delete the document');
     }
 })
+
+secureApiRouter.put('/update-score-by-activity', async (req, res) => {
+    try {
+        const { activityId, teamName, newScore } = req.body;
+        const updatedScores = await DB.updateScoresByActivity(activityId, teamName, newScore);
+        res.status(200).send(updatedScores);
+    } catch (err) {
+        console.error('Error updating score by activity:', err);
+        res.status(500).send({ msg: 'Failed to update score' });
+    }
+});
+
+secureApiRouter.get('/teams', async (req, res) => {
+    try {
+        const teams = await DB.getTeamNamesFromScores();
+        res.status(200).send(teams);
+    } catch (error) {
+        console.error('Error fetching team names:', error);
+        res.status(500).send({ msg: 'Failed to fetch team names' });
+    }
+});
+secureApiRouter.get('/get-activities', async (req, res) => {
+    try {
+        const activities = await DB.getActivities();
+        res.status(200).send(activities);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
+        res.status(500).send({ msg: 'Failed to fetch activities' });
+    }
+});
+secureApiRouter.get('/get-numActivity', async (req, res) => {
+    try {
+        const numActivity = await DB.getNumActsFromScores();
+        res.status(200).send(numActivity);
+    } catch (error) {
+        console.error('Error fetching participateNum:', error);
+        res.status(500).send({ msg: 'Failed to fetch participateNum' });
+    }
+});
+secureApiRouter.get('/get-score-and-participation', async (req, res) => {
+    try {
+        const { teamName, activityId } = req.query;
+
+        if (!teamName || !activityId) {
+            return res.status(400).send({ msg: 'Invalid input data' });
+        }
+
+        const team = await DB.getTeam(teamName);
+        console.log(team)
+        if (!team) {
+            return res.status(404).send({ msg: 'Team not found' });
+        }
+
+        const score = team.activities[activityId] || 0;
+        const participateNum = team.participateNum || 0; // Assuming participateNum is stored at the team level
+
+        res.status(200).send({ score, participateNum });
+    } catch (err) {
+        console.error('Error fetching score and participation:', err);
+        res.status(500).send({ msg: 'Failed to fetch score and participation' });
+    }
+});
 
 secureApiRouter.delete('/delete-multiple-activities', async (req, res) => {
     const activityNames = req.body;
