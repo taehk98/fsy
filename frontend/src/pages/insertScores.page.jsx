@@ -11,6 +11,9 @@ import {
   MDBRow,
 } from "mdb-react-ui-kit";
 import Dropdown from '../components/dropdown.component';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircle } from '@fortawesome/free-solid-svg-icons'
+
 
 const InsertScores = () => {
   const [score, setScore] = useState('');
@@ -59,7 +62,6 @@ const InsertScores = () => {
         storeInSession('score', JSON.stringify(scoresAndToken));
         setUserAuth(scoresAndToken);
         toast.success('점수를 추가했습니다.', {
-          id: toast.loading("점수를 추가중입니다."),
           duration: 2000,
         });
       }
@@ -70,7 +72,8 @@ const InsertScores = () => {
     }
   }
 
-  const handleAddScore = () => {
+  const handleAddScore = (e) => {
+    e.preventDefault();
     if (score.trim() && activityId && teamName) {
       updateScores(score, activityId, teamName);
       setScore('');
@@ -86,10 +89,10 @@ const InsertScores = () => {
   return (
     <>
       {access_token && (
-        <MDBContainer className="py-2 h-full">
-          <MDBRow className="d-flex justify-content-center align-items-center">
+        <MDBContainer className="py-2 overflow-y-auto" style={{ height: 'calc(100vh - 80px)' }}>
+          <MDBRow className="d-flex justify-content-center h-full">
             <MDBCol className="w-full">
-              <MDBCard id="list1" style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="h-fit w-full">
+              <MDBCard id="list1" style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="w-full">
                 <MDBCardBody className="py-2 px-3 px-md-5">
                   <p className="text-center py-2">
                     <u className='font-bold text-3xl no-underline'>점수 및 간식 관리</u>
@@ -117,29 +120,28 @@ const InsertScores = () => {
                           </button>
                         </div>
                         {currentScore !== null && (
-                          <div className="mt-2 text-center w-full">
+                          <div className="mt-2 text-center w-full ">
                             <p>현재 점수: {currentScore}</p>
-                            <p>참여 인원 수: {participateNum}</p>
+                            <p>참여 활동 수: {participateNum}</p>
                           </div>
                         )}
-                        <div className="d-flex flex-column align-items-center mt-2 w-full">
-                          <input
-                            type="number"
-                            className="form-control form-control-lg w-full border"
-                            placeholder="점수를 입력하세요"
-                            value={score}
-                            onChange={(e) => setScore(e.target.value)}
-                          />
-                          <button onClick={handleAddScore} className="w-full bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 mt-2">
-                            추가
-                          </button>
+                        <div className="d-flex flex-column align-items-center mt-2 w-full ">
+                          <form onSubmit={handleAddScore} className="w-full ">
+                            <input
+                              type="number"
+                              className="form-control form-control-lg w-full border"
+                              placeholder="점수를 입력하세요"
+                              value={score}
+                              onChange={(e) => setScore(e.target.value)}
+                            />
+                            <button type="submit" className="w-full bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 mt-2">
+                              추가
+                            </button>
+                          </form>
                         </div>
                       </MDBCardBody>
                     </MDBCard>
                   </div>
-                  {/* <hr className="my-4" /> */}
-                  {/* Existing code for rendering scores */}
-                  {/* ... */}
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>
