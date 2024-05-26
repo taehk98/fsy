@@ -118,6 +118,17 @@ secureApiRouter.get('/get-activityList', async (req, res) => {
     }
 });
 
+secureApiRouter.post('/update-snack', async (req, res) => {
+    try{
+        const { snack, teamName } = req.body;
+        authToken = req.cookies[authCookieName];
+        await DB.updateSnack(req, res, snack, teamName);
+        res.status(200)
+    } catch(err) {
+        res.status(400)
+    }
+})
+
 secureApiRouter.post('/insert-team', async (req, res) => {
     try {
         authToken = req.cookies[authCookieName];
@@ -200,7 +211,7 @@ secureApiRouter.get('/get-score-and-participation', async (req, res) => {
     try {
         const { teamName, activityId } = req.query;
 
-        if (!teamName || !activityId) {
+        if (!teamName) {
             return res.status(400).send({ msg: 'Invalid input data' });
         }
 
@@ -212,8 +223,9 @@ secureApiRouter.get('/get-score-and-participation', async (req, res) => {
 
         const score = team.activities[activityId] || 0;
         const participateNum = team.participateNum || 0; // Assuming participateNum is stored at the team level
+        const snack = team.snack;
 
-        res.status(200).send({ score, participateNum });
+        res.status(200).send({ score, participateNum, snack });
     } catch (err) {
         console.error('Error fetching score and participation:', err);
         res.status(500).send({ msg: 'Failed to fetch score and participation' });
