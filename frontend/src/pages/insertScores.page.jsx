@@ -23,7 +23,7 @@ const InsertScores = () => {
   const [participateNum, setParticipateNum] = useState(null);
 
   const {
-    userAuth: { access_token, scores },
+    userAuth: { access_token },
     setUserAuth,
   } = useContext(UserContext);
 
@@ -59,6 +59,7 @@ const InsertScores = () => {
 
       if (response.ok) {
         const scoresAndToken = await response.json();
+        console.log(scoresAndToken)
         storeInSession('score', JSON.stringify(scoresAndToken));
         setUserAuth(scoresAndToken);
         toast.success('점수를 추가했습니다.', {
@@ -77,8 +78,8 @@ const InsertScores = () => {
     if (score.trim() && activityId && teamName) {
       updateScores(score, activityId, teamName);
       setScore('');
-      setActivityId('');
-      setTeamName('');
+      // setActivityId('');
+      // setTeamName('');
     } else {
       toast.error('Please fill in all fields.', {
         duration: 2000,

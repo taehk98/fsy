@@ -156,7 +156,8 @@ secureApiRouter.put('/update-score-by-activity', async (req, res) => {
     try {
         const { activityId, teamName, newScore } = req.body;
         const updatedScores = await DB.updateScoresByActivity(activityId, teamName, newScore);
-        res.status(200).send(updatedScores);
+        authToken = req.cookies[authCookieName];
+        res.status(200).send({updatedScores: updatedScores , access_token: authToken , id: 'admin'});
     } catch (err) {
         console.error('Error updating score by activity:', err);
         res.status(500).send({ msg: 'Failed to update score' });
