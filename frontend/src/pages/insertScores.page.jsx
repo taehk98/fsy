@@ -12,7 +12,8 @@ import {
 } from "mdb-react-ui-kit";
 import Dropdown from '../components/dropdown.component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCircle } from '@fortawesome/free-regular-svg-icons';
 
 
 const InsertScores = () => {
@@ -21,6 +22,7 @@ const InsertScores = () => {
   const [teamName, setTeamName] = useState('');
   const [currentScore, setCurrentScore] = useState(null);
   const [participateNum, setParticipateNum] = useState(null);
+  const [snackData, setSnackData] = useState([]);
 
   const {
     userAuth: { access_token },
@@ -28,24 +30,31 @@ const InsertScores = () => {
   } = useContext(UserContext);
 
   async function fetchScoreAndParticipation() {
-    const id = toast.loading('데이터를 가져오는 중입니다.')
     try {
       const response = await fetch(`/api/get-score-and-participation?teamName=${teamName}&activityId=${activityId}`);
       if (response.ok) {
         const data = await response.json();
-        setCurrentScore(data.score);
+        if(activityId !== '' && activityId !== undefined && activityId !== null) {
+            setCurrentScore(data.score);
+        }
         setParticipateNum(data.participateNum);
-        toast.success('데이터를 가져왔습니다.', { id: id, duration: 2000 });
+        setSnackData(data.snack);
+        console.log(data.snack);
+        toast.success('데이터를 가져왔습니다.', { duration: 1000 });
       } else {
-        toast.error('데이터를 가져오는데 실패했습니다.', { id: id, duration: 3000 });
+        if(activityId !== '' && activityId !== undefined && activityId !== null) {
+            toast.error('팀을 확인해주세요.', { duration: 2000 });
+        }else {
+            toast.error('팀과 활동을 확인해주세요.', { duration: 2000 });
+        }
+        
       }
     } catch (error) {
-      toast.error('데이터를 가져오는데 실패했습니다.', { id: id, duration: 3000 });
+      toast.error('데이터를 가져오는데 실패했습니다.', { duration: 2000 });
     }
   }
 
   async function updateScores(newScore, activityId, teamName) {
-    const id = toast.loading('업데이트 중입니다.')
     try {
       const response = await fetch('/api/update-score-by-activity', {
         method: 'PUT',
@@ -63,13 +72,11 @@ const InsertScores = () => {
         const scoresAndToken = await response.json();
         storeInSession('data', JSON.stringify(scoresAndToken.updatedScores));
         toast.success('점수를 업데이트했습니다.', {
-            id: id,
           duration: 1000,
         });
       }
     } catch (error) {
       toast.error('점수 업데이트에 실패했습니다.', {
-        id: id,
         duration: 2000,
       });
     }
@@ -89,6 +96,41 @@ const InsertScores = () => {
     }
   };
 
+  const handleSnackButton = async (index) => {
+    // 상태를 변경하는 함수를 호출하여 snackData 상태를 업데이트합니다.
+    let snack = [];
+    setSnackData(prevSnackData => {
+      const updatedSnackData = [...prevSnackData];
+      updatedSnackData[index] = !updatedSnackData[index];
+      snack = updatedSnackData;
+      return updatedSnackData;
+    });
+    try {
+        console.log(snack);
+        const response = await fetch('/api/update-snack', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            snack,
+            teamName,
+          })
+        });
+  
+        if (response.ok) {
+          toast.success('업데이트 되었습니다.', {
+            duration: 1000,
+          });
+        }
+      } catch (error) {
+        toast.error('업데이트에 실패했습니다.', {
+          duration: 2000,
+        });
+      }
+
+  };
+
   return (
     <>
       {access_token && (
@@ -106,42 +148,46 @@ const InsertScores = () => {
                         <div className="d-flex flex-column align-items-center w-full">
                           <Dropdown
                             endpoint="/api/teams"
-                            placeholder="팀을 선택하세요"
+                            placeholder="조를 선택하세요."
                             onChange={(selectedOption) => setTeamName(selectedOption.value)}
                           />
                         </div>
                         <div className="d-flex flex-column align-items-center mt-2 w-full">
                           <Dropdown
                             endpoint="/api/get-activities"
-                            placeholder="활동을 선택하세요"
+                            placeholder="활동을 선택하세요."
                             onChange={(selectedOption) => setActivityId(selectedOption.value)}
                           />
                         </div>
-                        <div className="d-flex flex-column align-items-center mt-2 w-full">
-                          <button onClick={fetchScoreAndParticipation} className="w-full bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                        <div className="flex justify-content-center py-2 pt-3">
+                          <button onClick={fetchScoreAndParticipation} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
                             점수 조회
                           </button>
                         </div>
                         {currentScore !== null && (
-                            <div className="mt-4 text-center w-full">
-                                <p className="text-xl font-semibold mb-2">현재 점수:</p>
+                            <div className="text-center w-full">
+                                <p className="text-xl font-semibold mb-2 mt-2">현재 점수:</p>
                                 <div className="bg-gray-100 rounded-lg p-2 mx-auto w-32">
                                 <p className="text-2xl text-pink-500">{currentScore}</p>
                                 </div>
                             </div>
                             )}  
-                        <div className="d-flex flex-column align-items-center mt-2 w-full ">
-                          <form onSubmit={handleAddScore} className="w-full ">
+                        <div className="border-t border-gray-300 my-4"></div>
+                        <div className="d-flex flex-column align-items-center mt-6 md:justify-content-center md:items-center md:flex md:w-full">
+                          <form onSubmit={handleAddScore} className="w-3/5 md:w-96">
                             <input
                               type="number"
                               className="form-control form-control-lg w-full border"
-                              placeholder="점수를 입력하세요"
+                              placeholder="점수를 입력하세요."
                               value={score}
                               onChange={(e) => setScore(e.target.value)}
                             />
-                            <button type="submit" className="w-full bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 mt-2">
-                              추가
-                            </button>
+                            <div className='flex justify-content-center mt-2'>
+                                <button type="submit" className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 mt-2">
+                                    점수 업데이트
+                                </button>
+                            </div>
+                            
                           </form>
                         </div>
                       </MDBCardBody>
@@ -160,13 +206,40 @@ const InsertScores = () => {
                   </p>
                   <div className="pb-1">
                     <MDBCard className="w-full">
-                      <MDBCardBody>
-                        {currentScore !== null && (
-                            <div className="mt-2 text-center w-full ">
-                                <p>참여 활동 수: {participateNum}</p>
+                        <MDBCardBody>
+                        <div className="d-flex flex-column align-items-center w-full">
+                          <Dropdown
+                            endpoint="/api/teams"
+                            placeholder="조를 선택하세요."
+                            onChange={(selectedOption) => setTeamName(selectedOption.value)}
+                          />
+                        </div>
+                            <div className="flex justify-content-center py-2 pt-3">
+                            <button onClick={fetchScoreAndParticipation} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                                조회
+                            </button>
                             </div>
-                        )}
-                      </MDBCardBody>
+                            {participateNum !== null && (
+                                <div className="text-center w-full">
+                                    <p className="text-xl font-semibold mb-2">참여 활동 수:</p>
+                                    <div className="bg-gray-100 rounded-lg p-2 mx-auto w-32">
+                                    <p className="text-2xl text-pink-500">{participateNum}</p>
+                                    </div>
+                                </div>
+                            )}  
+                            <div className='flex items-center justify-center px-6 py-2'>
+                                {snackData.map((snack, index) => (
+                                <div key={index} className="relative">
+                                    <FontAwesomeIcon
+                                    icon={snack ? faCircleCheck : faCircle}
+                                    className="text-green-500 text-3xl m-2"
+                                    onClick={() => handleSnackButton(index)}
+                                    />
+                                </div>
+                                ))}
+                            </div>
+                            
+                        </MDBCardBody>
                     </MDBCard>
                   </div>
                 </MDBCardBody>

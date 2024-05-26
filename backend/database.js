@@ -91,6 +91,29 @@ async function getActivityList() {
     }
 }
 
+async function updateSnack(req, res, snackData, teamName) {
+    try {
+        // Ensure snackData is an array
+        if (!Array.isArray(snackData)) {
+            return res.status(400).json({ error: 'snackData는 배열이어야 합니다.' });
+        }
+
+        const result = await scoresCollection.updateOne(
+            { teamName: teamName },
+            { $set: { snack: snackData } }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: '팀을 찾을 수 없습니다.' });
+        } else {
+            return res.status(200).json({ message: '간식이 업데이트되었습니다.' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+    }
+}
+
 async function insertTeam(team) {
     try {
         // 팀 이름 중복 확인
@@ -383,5 +406,6 @@ module.exports = {
     insertActivity,
     deleteActivity,
     deleteMultipleActivities,
-    deleteUserToken
+    deleteUserToken,
+    updateSnack
 };
