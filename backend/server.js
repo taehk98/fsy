@@ -71,7 +71,12 @@ apiRouter.post('/auth/login', async (req, res) => {
 
   // DeleteAuth token if stored in cookie
 apiRouter.delete('/auth/logout', async (_req, res) => {
+    authToken = req.cookies[authCookieName];
+    const user = await DB.deleteUserToken(authToken);
     res.clearCookie(authCookieName);
+    if (user) {
+        res.status(400).send({ msg: 'Failed to remove token' });
+    }
     userID = null;
     res.status(204).end();
 });
@@ -231,7 +236,8 @@ secureApiRouter.post('/insert-activity', async (req, res) => {
     try {
         authToken = req.cookies[authCookieName];
         const activityList = await DB.insertActivity(req.body.activityName);
-        res.status(200).send({access_token: authToken , id: 'admin', activityList: activityList });
+        const scores = await DB.initialScores();
+        res.status(200).send({access_token: authToken , id: 'admin', scores: scores, activityList: activityList });
     } catch(err) {
         res.status(400).send(err.message);
     }

@@ -34,18 +34,42 @@ async function initialScores() {
 }
 
 async function setAdminToken(id, token) {
-    return await userCollection.updateOne(
-        { id: id },
-        { $set: { token: token } }
-    );
+    // await userCollection.updateOne(
+    //     { id: id },
+    //     { $set: { token: token } }
+    // );
+    try{
+        const insertResult = await userCollection.updateOne(
+            { id: id },
+            {
+              $push: {
+                token: token
+              }
+            }
+        );
+    }catch (error) {
+        console.error('유저 데이터 업데이트 오류:', error);
+    }
+    
 }
 
 async function getUser(email) {
     return await userCollection.findOne({ email: email });
   }
   
-async function getUserByToken(token) {
-    return await userCollection.findOne({ token: token });
+async function getUserByToken(tokenID) {
+    // return await userCollection.findOne({ token: token });
+    return await userCollection.findOne({ token: tokenID  })
+}
+
+async function deleteUserToken(tokenID) {
+    // return await db.collection.find({ token: { $elemMatch: tokenID } })
+
+    return await userCollection.updateOne(
+        { "token": tokenID }, // 조건: token 배열에 tokenID가 있는 문서
+        { $pull: { token: tokenID } } // $pull 연산자를 사용하여 token 배열에서 tokenID와 일치하는 요소를 제거
+    );
+    
 }
 
 async function getAdmin(userId) {
@@ -358,5 +382,6 @@ module.exports = {
     deleteMultipleTeams,
     insertActivity,
     deleteActivity,
-    deleteMultipleActivities
+    deleteMultipleActivities,
+    deleteUserToken
 };

@@ -72,8 +72,7 @@ export function ActivityList() {
             if (response.status === 200) {
                 console.log("here")
                 const scoresAndTokenAndId = await response.json();
-                storeInSession('user', JSON.stringify(scoresAndTokenAndId));
-                setUserAuth(scoresAndTokenAndId);
+                storeInSession('data', JSON.stringify(scoresAndTokenAndId.scores));
                 setActivityList(scoresAndTokenAndId.activityList[0].activities);
                 setActivityName('');
                 toast.success('활동을 추가했습니다.', {
