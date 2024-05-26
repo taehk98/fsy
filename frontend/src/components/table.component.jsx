@@ -188,12 +188,12 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row" align="center" >
+        <TableCell component="th" scope="row" align="center" style={{ fontSize: '15px'}}>
              {ranking}등
         </TableCell>
-        <TableCell align="center" >{row.teamName}조</TableCell>
-        <TableCell align="center" >{row.participateNum} / {totalNum}</TableCell>
-        <TableCell align="center" >{row.totalScore}점</TableCell>
+        <TableCell align="center" style={{ fontSize: '15px'}} >{row.teamName}조</TableCell>
+        <TableCell align="center" style={{ fontSize: '15px'}} >{row.participateNum} / {totalNum}</TableCell>
+        <TableCell align="center" style={{ fontSize: '15px'}} >{row.totalScore}점</TableCell>
       </TableRow>
       <TableRow style={{ backgroundColor: index % 2 !== 0 ? '#FFEFEF' : 'transparent' }}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -205,30 +205,30 @@ function Row(props) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                 <TableRow className={index % 2 !== 0 ? 'bg-white rounded-lg' : 'bg-orange rounded-lg'}>
-                    <TableCell align="center">활동명</TableCell>
-                    <TableCell align="center">점수</TableCell>
-                    <TableCell align="center">활동명</TableCell>
-                    <TableCell align="center">점수</TableCell>
+                    <TableCell align="center" style={{ fontFamily: 'Inter', fontSize: '13px'}}>활동명</TableCell>
+                    <TableCell align="center" style={{ fontFamily: 'Inter' , fontSize: '13px'}}>점수</TableCell>
+                    <TableCell align="center" style={{ fontFamily: 'Inter' , fontSize: '13px'}}>활동명</TableCell>
+                    <TableCell align="center" style={{ fontFamily: 'Inter' , fontSize: '13px'}}>점수</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                 {row.activities && Object.entries(row.activities).map(([activityName, score], index) => (
                     index % 2 === 0 ? (
                         // 짝수 번째 활동인 경우
-                        <TableRow key={index}>
-                            <TableCell component="th" scope="row" align="center">
+                        <TableRow key={index}  style={{ fontSize: '13px', fontFamily: 'Inter'}}>
+                            <TableCell component="th" scope="row" align="center" style={{ fontSize: '13px', fontFamily: 'Inter'}}>
                                 {activityName}
                             </TableCell>
-                            <TableCell align="center">{score}</TableCell>
+                            <TableCell align="center"  style={{ fontSize: '13px', fontFamily: 'Inter'}}>{score}</TableCell>
                             {/* 다음 홀수 번째 활동이 있는지 확인하고 있으면 렌더링 */}
                             {index + 1 < Object.entries(row.activities).length && (
-                                <TableCell component="th" scope="row" align="center">
+                                <TableCell component="th" scope="row" align="center" style={{ fontSize: '13px', fontFamily: 'Inter'}}>
                                     {Object.entries(row.activities)[index + 1][0]}
                                 </TableCell>
                             )}
                             {/* 다음 홀수 번째 활동의 점수가 있는지 확인하고 있으면 렌더링 */}
                             {index + 1 < Object.entries(row.activities).length && (
-                                <TableCell align="center">
+                                <TableCell align="center" style={{ fontSize: '13px', fontFamily: 'Inter'}}>
                                     {Object.entries(row.activities)[index + 1][1]}
                                 </TableCell>
                             )}
@@ -247,13 +247,14 @@ function Row(props) {
 
   return (
     <>  
+        <div className='overflow-y-auto py-1' style={{ height: 'calc(100vh - 80px)' }}>
         <Toaster/>
         <div className='text-2xl rounded font-bold text-center py-2 bg-pink-100 mx-2 flex justify-center relative'>
             <span >실시간 순위표</span>
             <FontAwesomeIcon icon={faArrowsRotate} onClick={fetchData} className="absolute right-0 top-1/2 transform -translate-y-1/2 pr-2" />
         </div>
         <div className='mx-2'>
-        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%' }} >
+        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%' }} style={{  height: 'calc(100vh - 140px)', overflowY: 'auto' }}>
         <Table aria-label="collapsible table" style={{ maxWidth: '100%' }} sx={{ minWidth: 350}} size="small">
             <TableHead className='bg-ppink'>
             <TableRow 
@@ -277,13 +278,14 @@ function Row(props) {
                 </TableCell>
             </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody >
             {rows.map((row, index) => (
                 <Row key={`${row.teamName}-${index}`} row={row} index={index} length={rows.length}/>
             ))}
             </TableBody>
         </Table>
         </TableContainer>
+        </div>
         </div>
     </>  
   );

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from '../App';
 import { lookInSession, storeInSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
@@ -23,36 +23,67 @@ const InsertScores = () => {
   const [currentScore, setCurrentScore] = useState(null);
   const [participateNum, setParticipateNum] = useState(null);
   const [snackData, setSnackData] = useState([]);
+  const [showSnack, setShowSnack] = useState(false);
 
   const {
     userAuth: { access_token },
     setUserAuth,
   } = useContext(UserContext);
 
-  async function fetchScoreAndParticipation() {
+
+  async function fetchScoreAndParticipation(teamNameForSnack) {
+    teamNameForSnack ? setShowSnack(true) : setShowSnack(false)
+    teamNameForSnack = teamNameForSnack ? teamNameForSnack : teamName;
     try {
-      const response = await fetch(`/api/get-score-and-participation?teamName=${teamName}&activityId=${activityId}`);
-      if (response.ok) {
-        const data = await response.json();
-        if(activityId !== '' && activityId !== undefined && activityId !== null) {
-            setCurrentScore(data.score);
+        const response = await fetch(`/api/get-score-and-participation?teamName=${teamNameForSnack}&activityId=${activityId}`);
+        if (response.ok) {
+            const data = await response.json();
+            if(activityId !== '' && activityId !== undefined && activityId !== null) {
+                setCurrentScore(data.score);
+            }
+            setParticipateNum(data.participateNum);
+            setSnackData(data.snack);
+            console.log(data.snack);
+            toast.success('데이터를 가져왔습니다.', { duration: 1000 });
+        } else {
+            if(activityId !== '' && activityId !== undefined && activityId !== null) {
+                toast.error('팀을 확인해주세요.', { duration: 2000 });
+            }else {
+                toast.error('팀과 활동을 확인해주세요.', { duration: 2000 });
+            }
+            
         }
-        setParticipateNum(data.participateNum);
-        setSnackData(data.snack);
-        console.log(data.snack);
-        toast.success('데이터를 가져왔습니다.', { duration: 1000 });
-      } else {
-        if(activityId !== '' && activityId !== undefined && activityId !== null) {
-            toast.error('팀을 확인해주세요.', { duration: 2000 });
-        }else {
-            toast.error('팀과 활동을 확인해주세요.', { duration: 2000 });
-        }
-        
-      }
     } catch (error) {
       toast.error('데이터를 가져오는데 실패했습니다.', { duration: 2000 });
     }
+    
   }
+
+//   async function fetchParticipation() {
+//     try {
+//         const response = await fetch(`/api/get-score-and-participation?teamName=${teamName}&activityId=${activityId}`);
+//         if (response.ok) {
+//             const data = await response.json();
+//             if(activityId !== '' && activityId !== undefined && activityId !== null) {
+//                 setCurrentScore(data.score);
+//             }
+//             setParticipateNum(data.participateNum);
+//             setSnackData(data.snack);
+//             console.log(data.snack);
+//             toast.success('데이터를 가져왔습니다.', { duration: 1000 });
+//         } else {
+//             if(activityId !== '' && activityId !== undefined && activityId !== null) {
+//                 toast.error('팀을 확인해주세요.', { duration: 2000 });
+//             }else {
+//                 toast.error('팀과 활동을 확인해주세요.', { duration: 2000 });
+//             }
+            
+//         }
+//     } catch (error) {
+//       toast.error('데이터를 가져오는데 실패했습니다.', { duration: 2000 });
+//     }
+    
+//   }
 
   async function updateScores(newScore, activityId, teamName) {
     try {
@@ -160,11 +191,11 @@ const InsertScores = () => {
                           />
                         </div>
                         <div className="flex justify-content-center py-2 pt-3">
-                          <button onClick={fetchScoreAndParticipation} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                          <button onClick={() => fetchScoreAndParticipation()} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
                             점수 조회
                           </button>
                         </div>
-                        {currentScore !== null && (
+                        {currentScore !== null && activityId !== null && (
                             <div className="text-center w-full">
                                 <p className="text-xl font-semibold mb-2 mt-2">현재 점수:</p>
                                 <div className="bg-gray-100 rounded-lg p-2 mx-auto w-32">
@@ -197,7 +228,7 @@ const InsertScores = () => {
               </MDBCard>
             </MDBCol>
           </MDBRow>
-          <MDBRow className="d-flex justify-content-center mt-6">
+          <MDBRow className={`d-flex justify-content-center mt-6 pb-6 ${showSnack ? '' : 'mb-6'}`}>
             <MDBCol className="w-full">
               <MDBCard style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="w-full">
                 <MDBCardBody className="py-2 px-3 px-md-5">
@@ -211,34 +242,36 @@ const InsertScores = () => {
                           <Dropdown
                             endpoint="/api/teams"
                             placeholder="조를 선택하세요."
-                            onChange={(selectedOption) => setTeamName(selectedOption.value)}
+                            custom={{ enabled: true }}
+                            onChange={(selectedOption) => fetchScoreAndParticipation(selectedOption.value)}
                           />
                         </div>
                             <div className="flex justify-content-center py-2 pt-3">
-                            <button onClick={fetchScoreAndParticipation} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
+                            {/* <button onClick={fetchScoreAndParticipation} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50">
                                 조회
-                            </button>
+                            </button> */}
                             </div>
-                            {participateNum !== null && (
+                            {participateNum !== null && showSnack !== false && (
                                 <div className="text-center w-full">
                                     <p className="text-xl font-semibold mb-2">참여 활동 수:</p>
                                     <div className="bg-gray-100 rounded-lg p-2 mx-auto w-32">
-                                    <p className="text-2xl text-pink-500">{participateNum}</p>
+                                        <p className="text-2xl text-pink-500">{participateNum}</p>
                                     </div>
                                 </div>
                             )}  
-                            <div className='flex items-center justify-center px-6 py-2'>
-                                {snackData.map((snack, index) => (
-                                <div key={index} className="relative">
-                                    <FontAwesomeIcon
-                                    icon={snack ? faCircleCheck : faCircle}
-                                    className="text-green-500 text-3xl m-2"
-                                    onClick={() => handleSnackButton(index)}
-                                    />
+                            {participateNum !== null && showSnack !== false && (
+                                <div className='flex items-center justify-center px-6 py-2'>
+                                    {snackData.map((snack, index) => (
+                                    <div key={index} className="relative">
+                                        <FontAwesomeIcon
+                                        icon={snack ? faCircleCheck : faCircle}
+                                        className="text-green-500 text-3xl m-2"
+                                        onClick={() => handleSnackButton(index)}
+                                        />
+                                    </div>
+                                    ))}
                                 </div>
-                                ))}
-                            </div>
-                            
+                            )}
                         </MDBCardBody>
                     </MDBCard>
                   </div>
