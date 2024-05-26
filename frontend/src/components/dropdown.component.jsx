@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { toast } from 'react-hot-toast';
 
-const Dropdown = ({ endpoint, placeholder, onChange }) => {
+const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
@@ -43,6 +43,19 @@ const Dropdown = ({ endpoint, placeholder, onChange }) => {
     }),
   };
 
+  const snackStyles = {
+    menu: (provided) => ({
+      ...provided,
+      maxHeight: '120px', // 원하는 높이로 설정
+      overflowY: 'auto', // overflow 설정
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      maxHeight: '120px', // 메뉴 리스트의 최대 높이 설정
+    }),
+  };
+
+
   return (
     <Select
       className="basic-single md:w-96 w-3/5 h-full"
@@ -51,7 +64,7 @@ const Dropdown = ({ endpoint, placeholder, onChange }) => {
       placeholder={placeholder}
       options={options}
       onChange={onChange}
-      styles={customStyles}
+      styles={custom ? snackStyles : customStyles}
     />
   );
 };
