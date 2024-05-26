@@ -10,7 +10,7 @@ const Dropdown = ({ endpoint, placeholder, onChange }) => {
       try {
         const response = await fetch(endpoint);
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
 
         const formattedOptions = data.map(item => ({
           value: item.teamName || item.activity,
