@@ -123,9 +123,9 @@ secureApiRouter.post('/update-snack', async (req, res) => {
         const { snack, teamName } = req.body;
         authToken = req.cookies[authCookieName];
         await DB.updateSnack(req, res, snack, teamName);
-        res.status(200)
+        res.status(200).send();
     } catch(err) {
-        res.status(400)
+        res.status(400).send();
     }
 })
 

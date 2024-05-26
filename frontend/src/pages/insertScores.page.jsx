@@ -24,6 +24,7 @@ const InsertScores = () => {
   const [participateNum, setParticipateNum] = useState(null);
   const [snackData, setSnackData] = useState([]);
   const [showSnack, setShowSnack] = useState(false);
+  const [snackTeamName, setSnackTeamName] = useState('');
 
   const {
     userAuth: { access_token },
@@ -31,9 +32,15 @@ const InsertScores = () => {
   } = useContext(UserContext);
 
 
-  async function fetchScoreAndParticipation(teamNameForSnack) {
-    teamNameForSnack ? setShowSnack(true) : setShowSnack(false)
-    teamNameForSnack = teamNameForSnack ? teamNameForSnack : teamName;
+  async function fetchScoreAndParticipation(teamNameForSnack=null) {
+    if(teamNameForSnack) {
+        setShowSnack(true);
+        setSnackTeamName(teamNameForSnack);
+    } else {
+        setShowSnack(false);
+        teamNameForSnack = teamName;
+    }
+    console.log(teamNameForSnack);
     try {
         const response = await fetch(`/api/get-score-and-participation?teamName=${teamNameForSnack}&activityId=${activityId}`);
         if (response.ok) {
@@ -58,32 +65,6 @@ const InsertScores = () => {
     }
     
   }
-
-//   async function fetchParticipation() {
-//     try {
-//         const response = await fetch(`/api/get-score-and-participation?teamName=${teamName}&activityId=${activityId}`);
-//         if (response.ok) {
-//             const data = await response.json();
-//             if(activityId !== '' && activityId !== undefined && activityId !== null) {
-//                 setCurrentScore(data.score);
-//             }
-//             setParticipateNum(data.participateNum);
-//             setSnackData(data.snack);
-//             console.log(data.snack);
-//             toast.success('데이터를 가져왔습니다.', { duration: 1000 });
-//         } else {
-//             if(activityId !== '' && activityId !== undefined && activityId !== null) {
-//                 toast.error('팀을 확인해주세요.', { duration: 2000 });
-//             }else {
-//                 toast.error('팀과 활동을 확인해주세요.', { duration: 2000 });
-//             }
-            
-//         }
-//     } catch (error) {
-//       toast.error('데이터를 가져오는데 실패했습니다.', { duration: 2000 });
-//     }
-    
-//   }
 
   async function updateScores(newScore, activityId, teamName) {
     try {
@@ -127,39 +108,42 @@ const InsertScores = () => {
     }
   };
 
-  const handleSnackButton = async (index) => {
-    // 상태를 변경하는 함수를 호출하여 snackData 상태를 업데이트합니다.
-    let snack = [];
-    setSnackData(prevSnackData => {
-      const updatedSnackData = [...prevSnackData];
-      updatedSnackData[index] = !updatedSnackData[index];
-      snack = updatedSnackData;
-      return updatedSnackData;
-    });
+  const handleCheckCircle = async (index) => {
+    console.log(index);
+    const updatedSnackData = [...snackData];
+    updatedSnackData[index] = !updatedSnackData[index];
+
+    setSnackData(updatedSnackData);
+  }
+
+  const handleSnackButton = async () => {
+    const id = toast.loading('업데이트 중입니다.');
     try {
-        console.log(snack);
         const response = await fetch('/api/update-snack', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            snack,
-            teamName,
+            snack: snackData,
+            teamName: snackTeamName,
           })
         });
   
         if (response.ok) {
           toast.success('업데이트 되었습니다.', {
-            duration: 1000,
+            id: id,
+            duration: 2000,
           });
+        }else {
+            throw new Error(`업데이트에 실패했습니다.`);
         }
       } catch (error) {
         toast.error('업데이트에 실패했습니다.', {
-          duration: 2000,
+            id: id,
+            duration: 2000,
         });
       }
-
   };
 
   return (
@@ -233,7 +217,7 @@ const InsertScores = () => {
               <MDBCard style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="w-full">
                 <MDBCardBody className="py-2 px-3 px-md-5">
                   <p className="text-center py-2">
-                    <u className='font-bold text-3xl no-underline'>간식</u>
+                    <u className='font-bold text-3xl no-underline'>간식 관리</u>
                   </p>
                   <div className="pb-1">
                     <MDBCard className="w-full">
@@ -259,17 +243,24 @@ const InsertScores = () => {
                                     </div>
                                 </div>
                             )}  
-                            {participateNum !== null && showSnack !== false && (
+                            {participateNum !== null && showSnack && (
+                                <div className="d-flex flex-column align-items-center">
                                 <div className='flex items-center justify-center px-6 py-2'>
                                     {snackData.map((snack, index) => (
                                     <div key={index} className="relative">
                                         <FontAwesomeIcon
                                         icon={snack ? faCircleCheck : faCircle}
                                         className="text-green-500 text-3xl m-2"
-                                        onClick={() => handleSnackButton(index)}
+                                        onClick={() => handleCheckCircle(index)}
                                         />
                                     </div>
                                     ))}
+                                </div>
+                                <div className='flex justify-content-center mt-2'>
+                                    <button type="submit" onClick={() => handleSnackButton()} className="md:w-48 bg-ppink text-white px-3 py-2 rounded hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 mt-2">
+                                    간식 현황 업데이트
+                                    </button>
+                                </div>
                                 </div>
                             )}
                         </MDBCardBody>

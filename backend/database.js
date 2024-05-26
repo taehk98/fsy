@@ -97,20 +97,21 @@ async function updateSnack(req, res, snackData, teamName) {
         if (!Array.isArray(snackData)) {
             return res.status(400).json({ error: 'snackData는 배열이어야 합니다.' });
         }
-
+        console.log(snackData);
+        console.log(teamName);
         const result = await scoresCollection.updateOne(
             { teamName: teamName },
             { $set: { snack: snackData } }
         );
 
         if (result.matchedCount === 0) {
-            return res.status(404).json({ error: '팀을 찾을 수 없습니다.' });
+            throw new Error(`업데이트에 실패했습니다.`);
         } else {
-            return res.status(200).json({ message: '간식이 업데이트되었습니다.' });
+            return { message: '간식이 업데이트되었습니다.' };
         }
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+        return { error: '서버 오류가 발생했습니다.' };
     }
 }
 
