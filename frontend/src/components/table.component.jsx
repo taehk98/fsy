@@ -119,6 +119,19 @@ export function CollapsibleTable() {
     };
     }
 
+
+    let isSafari = false;
+  
+    if(navigator.userAgent.match('CriOS')){
+        isSafari = true;
+    }
+    // if(/CriOS/i.test(navigator.userAgent) &&
+    //     /iphone|ipod|ipad/i.test(navigator.userAgent)){
+    //     isSafari = true;
+    // }else{
+    //     isSafari = false;
+    // }
+
 function Row(props) {
     const { row, index } = props;
     const [open, setOpen] = React.useState(false);
@@ -244,17 +257,18 @@ function Row(props) {
     </React.Fragment>
   );
 }
+// 'calc(100vh - 80px)'
 
   return (
     <>  
-        <div className='overflow-y-auto py-1' style={{ height: 'calc(100vh - 80px)' }}>
+        <div className='py-1' style={{ height: 'calc(100vh - 90px)', maxHeight: 'calc(100vh - 90px)'}}>
         <Toaster/>
         <div className='text-2xl rounded font-bold text-center py-2 bg-pink-100 mx-2 flex justify-center relative'>
             <span >실시간 순위표</span>
             <FontAwesomeIcon icon={faArrowsRotate} onClick={fetchData} className="absolute right-0 top-1/2 transform -translate-y-1/2 pr-2" />
         </div>
         <div className='mx-2'>
-        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%' }} style={{  height: 'calc(100vh - 140px)', overflowY: 'auto' }}>
+        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%', height:  isSafari ? 'calc(100% - 200px)' : 'calc(100vh - 140px)' , }} style={{ overflowY: 'auto' }}>
         <Table aria-label="collapsible table" style={{ maxWidth: '100%' }} sx={{ minWidth: 350}} size="small">
             <TableHead className='bg-ppink'>
             <TableRow 

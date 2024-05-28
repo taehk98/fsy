@@ -51,11 +51,11 @@ export function Unauthenticated(props) {
         const scoresAndTokenAndId = await response.json();
         toast.success(`로그인 성공`, {
             id: id,
+            duration: 1000
     });
     setTimeout(() => {
         storeInSession('user', JSON.stringify(scoresAndTokenAndId));
         setUserAuth(scoresAndTokenAndId);
-        window.location.href = '/rank';
     }, 1000);      
     } else {
       // const body = await response.json();
@@ -67,7 +67,7 @@ export function Unauthenticated(props) {
   }
 
   return access_token ? (
-    <Navigate to='/' />
+    <Navigate to='/rank' />
   ) : (
     <>
       <div className='h-cover flex flex-col items-center justify-center'>

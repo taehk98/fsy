@@ -56,7 +56,7 @@ const InsertScores = () => {
             if(activityId !== '' && activityId !== undefined && activityId !== null) {
                 toast.error('팀을 확인해주세요.', { duration: 2000 });
             }else {
-                toast.error('팀과 활동을 확인해주세요.', { duration: 2000 });
+                toast.error('조와 활동을 확인해주세요.', { duration: 2000 });
             }
             
         }
@@ -67,18 +67,24 @@ const InsertScores = () => {
   }
 
   async function updateScores(newScore, activityId, teamName) {
-    try {
-      const response = await fetch('/api/update-score-by-activity', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          activityId,
-          teamName,
-          newScore
+    if (newScore > 15) {
+        toast.error('15점 이하로 기입해주세요', {
+            duration: 2000
         })
-      });
+        return;
+    }
+    try {
+        const response = await fetch('/api/update-score-by-activity', {
+            method: 'PUT',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+            activityId,
+            teamName,
+            newScore
+            })
+        });
 
       if (response.ok) {
         const scoresAndToken = await response.json();
@@ -102,7 +108,7 @@ const InsertScores = () => {
       // setActivityId('');
       // setTeamName('');
     } else {
-      toast.error('Please fill in all fields.', {
+      toast.error('점수를 입력해주세요.', {
         duration: 2000,
       });
     }
@@ -164,6 +170,7 @@ const InsertScores = () => {
                           <Dropdown
                             endpoint="/api/teams"
                             placeholder="조를 선택하세요."
+                            style={{ fontSize: '16px'}}
                             onChange={(selectedOption) => setTeamName(selectedOption.value)}
                           />
                         </div>
@@ -171,6 +178,7 @@ const InsertScores = () => {
                           <Dropdown
                             endpoint="/api/get-activities"
                             placeholder="활동을 선택하세요."
+                            style={{ fontSize: '16px'}}
                             onChange={(selectedOption) => setActivityId(selectedOption.value)}
                           />
                         </div>
@@ -192,7 +200,8 @@ const InsertScores = () => {
                           <form onSubmit={handleAddScore} className="w-3/5 md:w-96">
                             <input
                               type="number"
-                              className="form-control form-control-lg w-full border"
+                              className="form-control form-control-lg w-full border text-base"
+                              style={{ fontSize: '16px'}}
                               placeholder="점수를 입력하세요."
                               value={score}
                               onChange={(e) => setScore(e.target.value)}
@@ -212,7 +221,7 @@ const InsertScores = () => {
               </MDBCard>
             </MDBCol>
           </MDBRow>
-          <MDBRow className={`d-flex justify-content-center mt-6 pb-6 ${showSnack ? '' : 'mb-6'}`}>
+          <MDBRow className={`d-flex justify-content-center mt-6 ${showSnack ? 'mb-2' : 'mb-2'}`}>
             <MDBCol className="w-full">
               <MDBCard style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="w-full">
                 <MDBCardBody className="py-2 px-3 px-md-5">

@@ -23,6 +23,10 @@
 background-color: #FFE6E6;  
 }
 
+.dropdown-select__control.dropdown-select__control--is-focused {
+    font-size: 16px !important;
+}
+
 @layer components {
   * {
     @apply m-0 p-0 box-border text-base outline-purple/30 duration-100;

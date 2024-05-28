@@ -156,9 +156,10 @@ async function insertActivity(activityName) {
 
 async function deleteActivity(activityName) {
     try {
+        const escapedActivityName = activityName.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
         let result = await scoresCollection.updateMany(
             { "activities": { $exists: true } }, // Ensure activities field exists
-            { $unset: { [`activities.${activityName}`]: "" } }
+            { $unset: { [`activities.${escapedActivityName}`]: "" } }
         );
 
         if (result.modifiedCount === 0) {

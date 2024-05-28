@@ -21,8 +21,8 @@ app.use(express.json());
 // Use the cookie parser middleware for tracking authentication tokens
 app.use(cookieParser());
 
-app.use(express.static('frontend'));
-//app.use(express.static('public'));
+// app.use(express.static('frontend'));
+app.use(express.static('public'));
 
 app.use(cors());
 
@@ -172,6 +172,9 @@ secureApiRouter.put('/update-score-by-activity', async (req, res) => {
     try {
         const { activityId, teamName, newScore } = req.body;
         const updatedScores = await DB.updateScoresByActivity(activityId, teamName, newScore);
+        if (newScore > 15) {
+            res.status(500).send({ msg: 'Failed to update score' });
+        }
         authToken = req.cookies[authCookieName];
         res.status(200).send({updatedScores: updatedScores , access_token: authToken , id: 'admin'});
     } catch (err) {
@@ -295,7 +298,7 @@ secureApiRouter.post('/attendances', async (req, res) => {
 });
 
 app.use((_req, res) => {
-    res.sendFile('index.html', { root: path.join(__dirname, '../frontend') });
+    res.sendFile('index.html', { root: path.join(__dirname, 'public') });
   });
 
 const httpService = app.listen(port, () => {

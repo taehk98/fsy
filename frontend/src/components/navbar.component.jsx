@@ -1,6 +1,6 @@
 import React , { useContext, useState }  from 'react';
 import logo from '../assets/fsy_logo.png';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate, Navigate } from 'react-router-dom';
 import { UserContext } from '../App';
 import MenuNavigationPanel from './menu-navigation.component';
 import { removeFromSession } from '../common/session';
@@ -25,9 +25,9 @@ const Navbar = () => {
         toast.success('로그아웃 되었습니다.');
         setTimeout(() => {
             setUserAuth({ access_token: null });
-            window.location.href = '/';
             removeFromSession('user');   
             removeFromSession('data');
+            window.location.href = '/';
         }, 1000);
     };
 

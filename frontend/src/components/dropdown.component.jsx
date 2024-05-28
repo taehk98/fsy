@@ -36,11 +36,21 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
       ...provided,
       maxHeight: '150px', // 원하는 높이로 설정
       overflowY: 'auto', // overflow 설정
+      fontSize: '16px'
     }),
     menuList: (provided) => ({
       ...provided,
       maxHeight: '150px', // 메뉴 리스트의 최대 높이 설정
+      fontSize: '16px'
     }),
+    option: (provided) => ({
+        ...provided,
+        fontSize: '16px', // 옵션 항목의 폰트 크기 설정
+      }),
+      control: (provided) => ({
+        ...provided,
+        fontSize: '16px', // 선택된 항목의 폰트 크기 설정
+      }),
   };
 
   const snackStyles = {
@@ -48,22 +58,35 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
       ...provided,
       maxHeight: '120px', // 원하는 높이로 설정
       overflowY: 'auto', // overflow 설정
+      fontSize: '16px'
     }),
     menuList: (provided) => ({
       ...provided,
       maxHeight: '120px', // 메뉴 리스트의 최대 높이 설정
-    }),
+      fontSize: '16px'
+    }), 
+    option: (provided) => ({
+        ...provided,
+        fontSize: '16px', // 옵션 항목의 폰트 크기 설정
+      }),
+      control: (provided) => ({
+        ...provided,
+        fontSize: '16px !important' // 선택된 항목의 폰트 크기 설정
+      }),
   };
 
 
   return (
     <Select
-      className="basic-single md:w-96 w-3/5 h-full"
+      className="basic-single md:w-96 w-3/5 h-full text-base"
       classNamePrefix="select"
       isSearchable={true}
+      menuPortalTarget={document.body} 
+      menuPlacement="auto"
       placeholder={placeholder}
       options={options}
       onChange={onChange}
+
       styles={custom ? snackStyles : customStyles}
     />
   );
