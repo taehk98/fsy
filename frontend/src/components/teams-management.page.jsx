@@ -51,7 +51,6 @@ export function TeamList() {
     
             if (response.status === 200) {
                 const scoresAndTokenAndId = await response.json();
-                console.log(scoresAndTokenAndId)
                 storeInSession('user', JSON.stringify(scoresAndTokenAndId));
                 setUserAuth(scoresAndTokenAndId);
                 storeInSession('data', JSON.stringify(scoresAndTokenAndId.scores));

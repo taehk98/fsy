@@ -8,7 +8,7 @@ const uuid = require('uuid');
 const url = `mongodb+srv://${config.userName}:${config.password}@${config.hostname}`;
 const client = new MongoClient(url);
 const db = client.db('fsy');
-const teamsCollection = db.collection('teams');
+
 const scoresCollection = db.collection('scores');
 const userCollection = db.collection('admin');
 const activityListCollection = db.collection('activityList');
@@ -34,10 +34,6 @@ async function initialScores() {
 }
 
 async function setAdminToken(id, token) {
-    // await userCollection.updateOne(
-    //     { id: id },
-    //     { $set: { token: token } }
-    // );
     try{
         const insertResult = await userCollection.updateOne(
             { id: id },
@@ -78,41 +74,6 @@ async function getAdmin(userId) {
 
 async function getTeam(teamName) {
     return await scoresCollection.findOne({ teamName: teamName });
-  }
-
-async function getActivityList() {
-    try {
-        const activities = await activityListCollection.find({}).toArray();
-        // console.log(activities)
-        return activities;
-    } catch (error) {
-        console.error('Error fetching activity list:', error);
-        throw error;
-    }
-}
-
-async function updateSnack(req, res, snackData, teamName) {
-    try {
-        // Ensure snackData is an array
-        if (!Array.isArray(snackData)) {
-            return res.status(400).json({ error: 'snackData는 배열이어야 합니다.' });
-        }
-        console.log(snackData);
-        console.log(teamName);
-        const result = await scoresCollection.updateOne(
-            { teamName: teamName },
-            { $set: { snack: snackData } }
-        );
-
-        if (result.matchedCount === 0) {
-            throw new Error(`업데이트에 실패했습니다.`);
-        } else {
-            return { message: '간식이 업데이트되었습니다.' };
-        }
-    } catch (err) {
-        console.error(err);
-        return { error: '서버 오류가 발생했습니다.' };
-    }
 }
 
 async function insertTeam(team) {
@@ -129,92 +90,6 @@ async function insertTeam(team) {
         return;
     }
 }
-
-async function insertActivity(activityName) {
-    try {
-        const updateResult = await scoresCollection.updateMany(
-            {},
-            {
-                $set: { [`activities.${activityName}`]: 0}
-            }
-        )
-        console.log('Update Result:', updateResult);
-        console.log(`Matched ${updateResult.matchedCount} documents and modified ${updateResult.modifiedCount} documents.`);
-        const insertResult = await activityListCollection.updateOne(
-            { _id: new ObjectId("664986b19214e7b98f93f3de") },
-            {
-              $push: {
-                activities: activityName
-              }
-            }
-        );
-        return await getActivityList();
-    } catch (error) {
-        console.error('Error updating documents:', error);
-    }
-}
-
-async function deleteActivity(activityName) {
-    try {
-        const escapedActivityName = activityName.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-        let result = await scoresCollection.updateMany(
-            { "activities": { $exists: true } }, // Ensure activities field exists
-            { $unset: { [`activities.${escapedActivityName}`]: "" } }
-        );
-
-        if (result.modifiedCount === 0) {
-            console.log("here");
-            throw new Error(`activities 필드를 못찾았습니다: ${activityName}`);
-        }
-
-        result = await activityListCollection.updateOne(
-            { _id: new ObjectId("664986b19214e7b98f93f3de") },
-            {
-                $pull: {
-                    activities: activityName
-                }
-            }
-        );
-        if (result.modifiedCount === 0) {
-            console.log("here");
-            throw new Error(`activities 필드를 못찾았습니다: ${activityName}`);
-        }
-      return await getActivityList();
-    } catch (error) {
-        throw new Error('활동 삭제에 실패했습니다.');
-    }
-}
-
-async function deleteMultipleActivities(activityNames) {
-    try {
-        for (let i = 0; i < activityNames.length; i++) {
-            
-            let result = await scoresCollection.updateMany(
-                { "activities": { $exists: true } }, // Ensure activities field exists
-                { $unset: { [`activities.${activityNames[i]}`]: "" } }
-            );
-
-            if (result.modifiedCount === 0) {
-                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
-            }
-
-            result = await activityListCollection.updateOne(
-                { _id: new ObjectId("664986b19214e7b98f93f3de") },
-                {
-                    $pull: {
-                        activities: activityNames[i]
-                    }
-                }
-            );
-            if (result.modifiedCount === 0) {
-                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
-            }
-        }
-      return await getActivityList();
-    } catch (error) {
-        throw new Error('활동 삭제에 실패했습니다.');
-    }
-  }
 
 async function deleteTeam(teamID) {
     try {
@@ -234,7 +109,7 @@ async function deleteTeam(teamID) {
     } catch (error) {
         throw new Error('팀들 삭제에 실패했습니다.');
     }
-  }
+}
 
 async function deleteMultipleTeams(teamIDs) {
     try {
@@ -266,60 +141,126 @@ async function deleteMultipleTeams(teamIDs) {
     }
 }
 
-// async function createUser(email, password, name, club) {
-//     // Hash the password before we insert it into the database
-//     const passwordHash = await bcrypt.hash(password, 10);
-//     const token = uuid.v4();
-//     const user = {
-//       email: email,
-//       password: passwordHash,
-//       token: token
-//     };
-//     await userCollection.insertOne(user);
-//     await collection.insertOne(newAttendance);
-  
-//     return user;
-//   }
-
-  // updates one attendance
-async function updateAttendances(newAttendance, attendances) {
-    let dbUser = await collection.findOne({email:newAttendance.email});
-            await collection.replaceOne(
-                {_id: new ObjectId(dbUser._id)},
-                newAttendance
-            )
-    attendances = await initialClubAttds(newAttendance.club, attendances);
-
-    return attendances;
-}
-
-// updates many attendances at once
-async function replaceAttentances(newAttendances, attendances) {
-    for(let i = 0; i < newAttendances.length; i++) {
-        let dbUser = await collection.findOne({email: newAttendances[i].email});
-        if (dbUser) {
-            const newAttendance = {
-                name: newAttendances[i].name,
-                club: newAttendances[i].club, 
-                willAttend: newAttendances[i].willAttend, 
-                actualAtt: newAttendances[i].actualAtt, 
-                attNum: newAttendances[i].attNum, 
-                notAttNum: newAttendances[i].notAttNum,
-                fakeAttNum: newAttendances[i].fakeAttNum,
-                password: newAttendances[i].password,
-                email: newAttendances[i].email,
-                token: newAttendances[i].token
-            };
-            await collection.replaceOne(
-                {_id: new ObjectId(dbUser._id)},
-                newAttendance
-            );
-        }else {
-            await collection.insertOne(newAttendances);
+async function updateSnack(req, res, snackData, teamName) {
+    try {
+        // Ensure snackData is an array
+        if (!Array.isArray(snackData)) {
+            return res.status(400).json({ error: 'snackData는 배열이어야 합니다.' });
         }
+        console.log(snackData);
+        console.log(teamName);
+        const result = await scoresCollection.updateOne(
+            { teamName: teamName },
+            { $set: { snack: snackData } }
+        );
+
+        if (result.matchedCount === 0) {
+            throw new Error(`업데이트에 실패했습니다.`);
+        } else {
+            return { message: '간식이 업데이트되었습니다.' };
+        }
+    } catch (err) {
+        console.error(err);
+        return { error: '서버 오류가 발생했습니다.' };
     }
-    return attendances;
 }
+
+async function insertActivity(activityName) {
+    try {
+        const updateResult = await scoresCollection.updateMany(
+            {},
+            {
+                $set: { [`activities.${activityName}`]: 0}
+            }
+        )
+        console.log('Update Result:', updateResult);
+        console.log(`Matched ${updateResult.matchedCount} documents and modified ${updateResult.modifiedCount} documents.`);
+        const insertResult = await activityListCollection.updateOne(
+            { _id: new ObjectId("6655327c3b77c61b1646dab2") },
+            {
+              $push: {
+                activities: activityName
+              }
+            }
+        );
+        return await getActivityList();
+    } catch (error) {
+        console.error('Error updating documents:', error);
+    }
+}
+
+async function getActivityList() {
+    try {
+        const activities = await activityListCollection.find({}).toArray();
+        // console.log(activities)
+        return activities;
+    } catch (error) {
+        console.error('Error fetching activity list:', error);
+        throw error;
+    }
+}
+
+async function deleteActivity(activityName) {
+    try {
+        const escapedActivityName = activityName.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        let result = await scoresCollection.updateMany(
+            { "activities": { $exists: true } }, // Ensure activities field exists
+            { $unset: { [`activities.${escapedActivityName}`]: "" } }
+        );
+
+        if (result.modifiedCount === 0) {
+            console.log("here");
+            throw new Error(`activities 필드를 못찾았습니다: ${activityName}`);
+        }
+
+        result = await activityListCollection.updateOne(
+            { _id: new ObjectId("6655327c3b77c61b1646dab2") },
+            {
+                $pull: {
+                    activities: activityName
+                }
+            }
+        );
+        if (result.modifiedCount === 0) {
+            console.log("here");
+            throw new Error(`activities 필드를 못찾았습니다: ${activityName}`);
+        }
+      return await getActivityList();
+    } catch (error) {
+        throw new Error('활동 삭제에 실패했습니다.');
+    }
+}
+
+async function deleteMultipleActivities(activityNames) {
+    try {
+        for (let i = 0; i < activityNames.length; i++) {
+            
+            let result = await scoresCollection.updateMany(
+                { "activities": { $exists: true } }, // Ensure activities field exists
+                { $unset: { [`activities.${activityNames[i]}`]: "" } }
+            );
+
+            if (result.modifiedCount === 0) {
+                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
+            }
+
+            result = await activityListCollection.updateOne(
+                { _id: new ObjectId("6655327c3b77c61b1646dab2") },
+                {
+                    $pull: {
+                        activities: activityNames[i]
+                    }
+                }
+            );
+            if (result.modifiedCount === 0) {
+                throw new Error(`activities 필드를 못찾았습니다: ${activityNames[i]}`);
+            }
+        }
+      return await getActivityList();
+    } catch (error) {
+        throw new Error('활동 삭제에 실패했습니다.');
+    }
+  }
 
 async function updateScoresByActivity(activityId, teamName, newScore) {
     try {
@@ -339,9 +280,6 @@ async function updateScoresByActivity(activityId, teamName, newScore) {
             }
             team.totalScore += Number(team.activities[activity]);
         }
-
-        // Recalculate total score
-        // team.totalScore = String(team.totalScore);
 
         // Update the document in the database
         await scoresCollection.updateOne(
@@ -400,8 +338,6 @@ module.exports = {
     initialScores,
     insertTeam,
     updateScoresByActivity,
-    updateAttendances,
-    replaceAttentances,
     getAdmin,
     deleteTeam,
     deleteMultipleTeams,

@@ -1,11 +1,9 @@
 import React, { useContext } from 'react';
-import AnimationWrapper from '../common/page-animation';
 import './unauthenticated.css';
 import InputBox from '../components/input.component';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
-// import Button from 'react-bootstrap/Button';
-// import {MessageDialog} from './messageDialog';
+
 import { storeInSession } from '../common/session';
 import { UserContext } from '../App';
 
@@ -15,8 +13,6 @@ export function Unauthenticated(props) {
     setUserAuth,
   } = useContext(UserContext);
 
-  // const [id, setID] = React.useState('');
-  // const [password, setPassword] = React.useState('');
   const [displayError, setDisplayError] = React.useState(null);
 
   async function loginUser(e)  {
@@ -31,13 +27,6 @@ export function Unauthenticated(props) {
     }
     loginOrCreate(`/api/auth/login`, formData, id);
   }
-
-  // async function createUser() {
-  //   if(!userName || !password || !userEmail || !clubName) {
-  //       setDisplayError(`⚠ Error: ${body.msg}`);
-  //   }
-  //   loginOrCreate(`/api/auth/create`);
-  // }
 
   async function loginOrCreate(endpoint, formData, id) {
     const response = await fetch(endpoint, {

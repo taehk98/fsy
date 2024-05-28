@@ -1,10 +1,8 @@
-import React , { useContext, useState, useEffect } from 'react';
-import { UserContext } from '../App';
+import React , { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { storeInSession, lookInSession } from '../common/session';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
-import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -20,10 +18,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export function CollapsibleTable() {
-    // const {
-    //     userAuth: { access_token, scores },
-    //     setUserAuth,
-    // } = useContext(UserContext);
     const [scores, setScores] = useState(() => {
         return JSON.parse(lookInSession('data')); 
     });

@@ -40,7 +40,6 @@ const InsertScores = () => {
         setShowSnack(false);
         teamNameForSnack = teamName;
     }
-    console.log(teamNameForSnack);
     try {
         const response = await fetch(`/api/get-score-and-participation?teamName=${teamNameForSnack}&activityId=${activityId}`);
         if (response.ok) {
@@ -67,10 +66,10 @@ const InsertScores = () => {
   }
 
   async function updateScores(newScore, activityId, teamName) {
-    if (newScore > 15) {
-        toast.error('15점 이하로 기입해주세요', {
+    if (isNaN(newScore) || newScore < 0 || newScore > 15) {
+        toast.error('0부터 15 사이의 숫자를 기입해주세요', {
             duration: 2000
-        })
+        });
         return;
     }
     try {
@@ -105,8 +104,6 @@ const InsertScores = () => {
     if (score.trim() && activityId && teamName) {
       updateScores(score, activityId, teamName);
       setScore('');
-      // setActivityId('');
-      // setTeamName('');
     } else {
       toast.error('점수를 입력해주세요.', {
         duration: 2000,
@@ -115,7 +112,6 @@ const InsertScores = () => {
   };
 
   const handleCheckCircle = async (index) => {
-    console.log(index);
     const updatedSnackData = [...snackData];
     updatedSnackData[index] = !updatedSnackData[index];
 

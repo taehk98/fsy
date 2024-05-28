@@ -1,4 +1,3 @@
-import AnimationWrapper from '../common/page-animation';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../App';
 import React, { useContext } from 'react';

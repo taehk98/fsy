@@ -10,13 +10,11 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
       try {
         const response = await fetch(endpoint);
         const data = await response.json();
-        // console.log(data);
 
         const formattedOptions = data.map(item => ({
           value: item.teamName || item.activity,
           label: item.teamName || item.activity
         }));
-        // console.log(formattedOptions);
         var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
         const options = formattedOptions.sort((a, b) => collator.compare(a.label, b.label));
 

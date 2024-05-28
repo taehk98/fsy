@@ -1,6 +1,6 @@
 import React , { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../App';
-import { lookInSession, storeInSession } from '../common/session';
+import { storeInSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -67,10 +67,8 @@ export function ActivityList() {
                 },
                 body: JSON.stringify({activityName: activityName})
             });
-            console.log(response.status);
     
             if (response.status === 200) {
-                console.log("here")
                 const scoresAndTokenAndId = await response.json();
                 storeInSession('data', JSON.stringify(scoresAndTokenAndId.scores));
                 setActivityList(scoresAndTokenAndId.activityList[0].activities);
