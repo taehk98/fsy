@@ -125,6 +125,7 @@ import { removeFromSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import zIndex from '@mui/material/styles/zIndex';
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
@@ -201,9 +202,15 @@ const Navbar = () => {
         }
     }
 
+    const navbarStyle = {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0
+    };
     return (
         <>
-            <nav className='navbar flex-items' style={{ position: 'fixed', top: 0, left: 0, right: 0 }}>
+            <nav className='navbar flex-items' style={{navbarStyle}}>
             {access_token ? (
                     <>
                     <div
@@ -239,10 +246,9 @@ const Navbar = () => {
                 )}
             </nav>
             <Toaster />
-            <div className='content'>
+            <div className={!menuNavPanel ? 'sticky z-20' : ''}>
                 <Outlet/>
             </div>
-            
         </>
     );
 };

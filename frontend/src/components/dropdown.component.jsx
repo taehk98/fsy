@@ -30,6 +30,7 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
   }, [endpoint]);
 
   const customStyles = {
+    menuPortal: base => ({ ...base, zIndex: 9999 }),
     menu: (provided) => ({
       ...provided,
       maxHeight: '150px', // 원하는 높이로 설정
@@ -56,6 +57,7 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
   };
 
   const snackStyles = {
+    menuPortal: base => ({ ...base, zIndex: 9999 }),
     menu: (provided) => ({
       ...provided,
       maxHeight: '120px', // 원하는 높이로 설정
@@ -84,7 +86,7 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
 
   return (
     <Select
-      className="basic-single md:w-96 w-3/5 h-full text-base"
+      className="basic-single md:w-96 w-3/5 h-full text-base z-40"
       classNamePrefix="select"
       isSearchable={true}
       menuPortalTarget={document.body} 
@@ -92,7 +94,6 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
       placeholder={placeholder}
       options={options}
       onChange={onChange}
-
       styles={custom ? snackStyles : customStyles}
     />
   );
