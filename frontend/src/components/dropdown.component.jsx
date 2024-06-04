@@ -34,20 +34,24 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
       ...provided,
       maxHeight: '150px', // 원하는 높이로 설정
       overflowY: 'auto', // overflow 설정
-      fontSize: '16px'
+      fontSize: '16px',
+      zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
     }),
     menuList: (provided) => ({
       ...provided,
       maxHeight: '150px', // 메뉴 리스트의 최대 높이 설정
-      fontSize: '16px'
+      fontSize: '16px',
+      zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
     }),
     option: (provided) => ({
         ...provided,
         fontSize: '16px', // 옵션 항목의 폰트 크기 설정
+        zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
       }),
       control: (provided) => ({
         ...provided,
         fontSize: '16px', // 선택된 항목의 폰트 크기 설정
+        zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
       }),
   };
 
@@ -56,20 +60,24 @@ const Dropdown = ({ endpoint, placeholder, onChange, custom=null }) => {
       ...provided,
       maxHeight: '120px', // 원하는 높이로 설정
       overflowY: 'auto', // overflow 설정
-      fontSize: '16px'
+      fontSize: '16px',
+      zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
     }),
     menuList: (provided) => ({
       ...provided,
       maxHeight: '120px', // 메뉴 리스트의 최대 높이 설정
-      fontSize: '16px'
+      fontSize: '16px',
+      zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
     }), 
     option: (provided) => ({
         ...provided,
         fontSize: '16px', // 옵션 항목의 폰트 크기 설정
+        zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
       }),
       control: (provided) => ({
         ...provided,
-        fontSize: '16px !important' // 선택된 항목의 폰트 크기 설정
+        fontSize: '16px !important', // 선택된 항목의 폰트 크기 설정
+        zIndex: 300 // 드랍다운 메뉴의 z-index 값 설정
       }),
   };
 

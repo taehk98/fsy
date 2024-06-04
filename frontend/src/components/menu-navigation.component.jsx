@@ -16,7 +16,7 @@ const MenuNavigationPanel = () => {
 
   return (
     access_token && 
-      <div className='bg-white absolute mt-3 left-0 border border-grey w-52 md:w-60 overflow-hidden duration-200'>
+      <div className='bg-white absolute mt-3 left-0 border border-grey w-52 md:w-60 overflow-hidden duration-200' style={{ zIndex: 110 }}>
         <Link to='/' className='flex gap-2 link pl-8 py-3 text-black'>
           <p>홈</p>
         </Link>

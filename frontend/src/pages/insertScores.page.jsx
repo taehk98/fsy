@@ -151,7 +151,7 @@ const InsertScores = () => {
   return (
     <>
       {access_token && (
-        <MDBContainer className="py-2 overflow-y-auto" style={{ height: 'calc(100vh - 80px)' }}>
+        <MDBContainer className="py-2 overflow-y-auto sticky" style={{ height: 'calc(100vh - 80px)' }}>
           <MDBRow className="d-flex justify-content-center">
             <MDBCol className="w-full">
               <MDBCard id="list1" style={{ borderRadius: ".75rem", backgroundColor: "#FFE6E6" }} className="w-full">
@@ -231,6 +231,7 @@ const InsertScores = () => {
                           <Dropdown
                             endpoint="/api/teams"
                             placeholder="조를 선택하세요."
+                            style={{ fontSize: '16px'}}
                             custom={{ enabled: true }}
                             onChange={(selectedOption) => fetchScoreAndParticipation(selectedOption.value)}
                           />

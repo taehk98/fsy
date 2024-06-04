@@ -64,6 +64,10 @@ background-color: #FFE6E6;
     @apply min-h-[calc(100vh-80px)];
   }
 
+  .content {
+    padding-top: 80px; /* Same height as the navbar */
+  }
+
   .center {
     @apply block mx-auto;
   }

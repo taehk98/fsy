@@ -59,13 +59,32 @@ async function getUserByToken(tokenID) {
 }
 
 async function deleteUserToken(tokenID) {
-    // return await db.collection.find({ token: { $elemMatch: tokenID } })
+    try {
+        const result = await userCollection.updateOne(
+            { "token": tokenID }, // 조건: token 배열에 tokenID가 있는 문서
+            { $pull: { token: tokenID } } // $pull 연산자를 사용하여 token 배열에서 tokenID와 일치하는 요소를 제거
+        );
 
-    return await userCollection.updateOne(
-        { "token": tokenID }, // 조건: token 배열에 tokenID가 있는 문서
-        { $pull: { token: tokenID } } // $pull 연산자를 사용하여 token 배열에서 tokenID와 일치하는 요소를 제거
-    );
-    
+        if (result.matchedCount === 0) {
+            console.log('No documents matched the query. tokenID:', tokenID);
+        } else if (result.modifiedCount === 0) {
+            console.log('The token was not found in the array. tokenID:', tokenID);
+        } else {
+            console.log('Token removed successfully. tokenID:', tokenID);
+        }
+
+        const updatedUser = await userCollection.findOne({ token: tokenID  })
+        if (updatedUser) {
+            console.log('Token still exists in the user document. tokenID:', tokenID);
+            return false; // 토큰이 여전히 존재하면 false 반환
+        } else {
+            console.log('Token confirmed removed. tokenID:', tokenID);
+            return true; // 토큰이 제거되었으므로 true 반환
+        }
+    } catch (error) {
+        console.error('Error removing token:', error);
+        throw error;
+    }
 }
 
 async function getAdmin(userId) {

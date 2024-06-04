@@ -36,22 +36,6 @@ app.use(function (err, req, res, next) {
     res.status(500).send({ type: err.name, message: err.message });
   });
 
-//http://api.football-data.org/v4/competitions/PL/standings 프리미어리그 순서 가져오는 api endpoint
-
-// apiRouter.post('/auth/create', async (req, res) => {
-//     if (await DB.getUser(req.body.email)) {
-//       res.status(409).send({ msg: 'Existing user' });
-//     } else {
-//         attendances = await DB.initialClubAttds(req.body.club, attendances);
-//         const user = await DB.createUser(req.body.email, req.body.password, req.body.name, req.body.club);
-//         attendances = await addUserToAttds(req.body.email, attendances);
-//         // Set the cookie
-//         setAuthCookie(res, user.token);
-  
-//         res.send({ name: req.body.name, club: req.body.club });
-//     }
-// });
-
 apiRouter.post('/auth/login', async (req, res) => {
     const user = await DB.getAdmin(req.body.id);
     if (user) {
@@ -70,15 +54,21 @@ apiRouter.post('/auth/login', async (req, res) => {
 });
 
   // DeleteAuth token if stored in cookie
-apiRouter.delete('/auth/logout', async (_req, res) => {
-    authToken = req.cookies[authCookieName];
-    const user = await DB.deleteUserToken(authToken);
-    res.clearCookie(authCookieName);
-    if (user) {
-        res.status(400).send({ msg: 'Failed to remove token' });
+apiRouter.delete('/auth/logout', async (req, res) => {
+    const authToken = req.cookies[authCookieName];
+    try {
+        const tokenRemoved = await DB.deleteUserToken(authToken);
+        if (tokenRemoved) {
+            res.clearCookie(authCookieName);
+            userID = null;
+            res.status(204).end();
+        } else {
+            res.status(400).send({ msg: 'Failed to remove token' });
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        res.status(400).send({ msg: '로그아웃 중 오류가 발생했습니다.' });
     }
-    userID = null;
-    res.status(204).end();
 });
 
 apiRouter.get('/get-scores', async (req, res) => {

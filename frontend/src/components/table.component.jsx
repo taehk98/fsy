@@ -54,7 +54,7 @@ export function CollapsibleTable() {
         // 저장한거 쓰려면 !scores일때만 하게 하면됨
     }, [])
 
-    const newDataArray = [];
+    let newDataArray = [];
 
     useEffect(() => {
         if(scores !== undefined && scores !== null){
@@ -63,16 +63,23 @@ export function CollapsibleTable() {
                 newDataArray.push(createData(teamName, participateNum, totalScore, activities));
             }
             setTotalNum(Object.keys(scores[0]['activities']).length);
+            newDataArray = [...newDataArray].sort((a, b) => b.totalScore - a.totalScore);
+            setRows(newDataArray);
+            setClicked('totalScore');
+            setSortByTotalScore(true);
+            setSortByParticipateNum(null);
+            setRankingOrder(false);
+
         }
     }, [scores])
 
     const [totalNum, setTotalNum] = useState(20);
-    const [rows, setRows] = useState(newDataArray);
+    const [rows, setRows] = useState([]);
     const [sortByTotalScore, setSortByTotalScore] = useState(null);
     const [sortByParticipateNum, setSortByParticipateNum] = useState(null);
     const [rankingOrder, setRankingOrder] = useState(null);
     const [clicked, setClicked] = useState(null);
-        
+ 
     const handleSortByTotalScore = () => {
         const sortedRows = [...rows].sort((a, b) => b.totalScore - a.totalScore);
         setRows(sortByTotalScore ? sortedRows.reverse() : sortedRows);
@@ -99,11 +106,6 @@ export function CollapsibleTable() {
         }
     };
 
-    useEffect(() => {
-        // Call sorting function when the component mounts
-        handleSortByTotalScore();
-    }, []);
-
     function createData(teamName, participateNum, totalScore, activities) {
     return {
         teamName,
@@ -114,17 +116,26 @@ export function CollapsibleTable() {
     }
 
 
-    let isSafari = false;
+    let isChromeForiOS = false;
+
+    var ua = window.navigator.userAgent;
+    let iOS = ua.match(/Macintosh/i) || ua.match(/iPad/i) || ua.match(/iPhone/i);
+    var webkit = ua.match(/WebKit/i);
+    var iOSSafari = iOS && webkit && !ua.match(/CriOS/i) && !ua.match(/EdgiOS/i) && !ua.match(/Chrome/i) && !ua.match(/Edg/i);
+
+    let userAgentString =  
+                navigator.userAgent; 
+          
+    // Detect Chrome 
+    let chromeAgent =  
+        userAgentString.indexOf("Chrome") > -1; 
   
-    if(navigator.userAgent.match('CriOS')){
-        isSafari = true;
-    }
-    // if(/CriOS/i.test(navigator.userAgent) &&
-    //     /iphone|ipod|ipad/i.test(navigator.userAgent)){
-    //     isSafari = true;
-    // }else{
-    //     isSafari = false;
-    // }
+      if (iOSSafari && !chromeAgent) {
+        isChromeForiOS = true;
+      }
+    
+
+    // const isChromeOnAndroid = /Chrome\/[.0-9]* Mobile/.test(navigator.userAgent) && /Android/.test(navigator.userAgent);
 
 function Row(props) {
     const { row, index } = props;
@@ -255,14 +266,14 @@ function Row(props) {
 
   return (
     <>  
-        <div className='py-1' style={{ height: 'calc(100vh - 90px)', maxHeight: 'calc(100vh - 90px)'}}>
+        <div style={{ top: '80px', left: 0, right: 0, bottom: 0 }} className='sticky'>
         <Toaster/>
-        <div className='text-2xl rounded font-bold text-center py-2 bg-pink-100 mx-2 flex justify-center relative'>
+        <div className='text-2xl rounded font-bold text-center py-2 mx-2 bg-pink-100 flex justify-center relative'>
             <span >실시간 순위표</span>
             <FontAwesomeIcon icon={faArrowsRotate} onClick={fetchData} className="absolute right-0 top-1/2 transform -translate-y-1/2 pr-2" />
         </div>
         <div className='mx-2'>
-        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%', height:  isSafari ? 'calc(100% - 200px)' : 'calc(100vh - 140px)' , }} style={{ overflowY: 'auto' }}>
+        <TableContainer component={Paper} className='bg-bgColor' sx={{ width: '100%', height: 'calc(100vh - 200px)'}} style={{ overflowY: 'auto' }}>
         <Table aria-label="collapsible table" style={{ maxWidth: '100%' }} sx={{ minWidth: 350}} size="small">
             <TableHead className='bg-ppink'>
             <TableRow 
