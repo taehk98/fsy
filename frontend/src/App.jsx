@@ -48,7 +48,6 @@ function App() {
           </Route>
         </Routes>
     </UserContext.Provider>
-    
   )
 }
 
