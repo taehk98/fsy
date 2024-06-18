@@ -1,6 +1,6 @@
 import React , { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../App';
-import { lookInSession, storeInSession } from '../common/session';
+import { storeInSession } from '../common/session';
 import { Toaster, toast } from 'react-hot-toast';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -67,10 +67,8 @@ export function ActivityList() {
                 },
                 body: JSON.stringify({activityName: activityName})
             });
-            console.log(response.status);
     
             if (response.status === 200) {
-                console.log("here")
                 const scoresAndTokenAndId = await response.json();
                 storeInSession('data', JSON.stringify(scoresAndTokenAndId.scores));
                 setActivityList(scoresAndTokenAndId.activityList[0].activities);
@@ -254,18 +252,6 @@ export function ActivityList() {
                         </MDBListGroupItem>
                         <MDBListGroupItem className="ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
                         <div className="d-flex flex-row justify-content-end mb-1 mr-6 pr-2">
-                            {/* <MDBTooltip
-                                tag="a"
-                                wrapperProps={{ href: "#!" }}
-                                title="Edit todo"
-                            >
-                                <MDBIcon
-                                    fas
-                                    icon="pencil-alt"
-                                    className="me-3"
-                                    color="info"
-                                />
-                            </MDBTooltip> */}
                             <MDBTooltip
                                 tag="a"
                                 wrapperProps={{ href: "#!" }}
@@ -299,7 +285,8 @@ export function ActivityList() {
                                         <div className="d-flex flex-row align-items-center">
                                             <input
                                                 type="text"
-                                                className="form-control form-control-lg w-9/12 md:w-11/12"
+                                                className="form-control form-control-lg w-9/12 md:w-11/12 text-base"
+                                                style={{ fontSize: '16px'}}
                                                 id="exampleFormControlInput1"
                                                 placeholder="활동 이름을 입력하세요..."
                                                 value={activityName}

@@ -51,11 +51,11 @@ export function TeamList() {
     
             if (response.status === 200) {
                 const scoresAndTokenAndId = await response.json();
-                console.log(scoresAndTokenAndId)
                 storeInSession('user', JSON.stringify(scoresAndTokenAndId));
                 setUserAuth(scoresAndTokenAndId);
                 storeInSession('data', JSON.stringify(scoresAndTokenAndId.scores));
                 setRows(scoresAndTokenAndId.scores);
+                setScores(scoresAndTokenAndId.scores);
                 setTeamName('');
                 toast.success('조를 추가했습니다.', {
                     id: toastID,
@@ -329,9 +329,10 @@ export function TeamList() {
                                     <div className="d-flex flex-row align-items-center">
                                         <input
                                             type="text"
-                                            className="form-control form-control-lg w-9/12 md:w-11/12"
+                                            className="form-control form-control-lg w-9/12 md:w-11/12 text-base"
                                             id="exampleFormControlInput1"
                                             placeholder="예시) 1조 -> 1"
+                                            style={{ fontSize: '16px'}}
                                             value={teamName}
                                             onChange={(e) => setTeamName(e.target.value)}
                                         />

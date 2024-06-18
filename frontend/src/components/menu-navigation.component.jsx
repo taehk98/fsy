@@ -1,4 +1,3 @@
-import AnimationWrapper from '../common/page-animation';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../App';
 import React, { useContext } from 'react';
@@ -17,7 +16,7 @@ const MenuNavigationPanel = () => {
 
   return (
     access_token && 
-      <div className='bg-white absolute mt-3 left-0 border border-grey w-52 md:w-60 overflow-hidden duration-200'>
+      <div className='bg-white absolute mt-3 left-0 border border-grey w-52 md:w-60 overflow-hidden duration-200 z-50'>
         <Link to='/' className='flex gap-2 link pl-8 py-3 text-black'>
           <p>홈</p>
         </Link>

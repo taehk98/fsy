@@ -24,7 +24,11 @@ export default {
         fsygreen: '#26BFBF',
         fsylightblue: '#25A6D9',
         fsyblue: '#2594D9',
-        orange: '#FFEFEF'
+        orange: '#FFEFEF',
+        skyblue: '#A7E6FF',
+        middleblue: '#3ABEF9',
+        lightblue: '#3ABEF9',
+        darkblue: '#050C9C'
         // 더연한거 FAFCFF / #F5F8FC
       },
       fontSize: {

@@ -6,6 +6,7 @@ import { lookInSession } from './common/session';
 import HomePage from './pages/home.page';
 import PageNotFound from './pages/404.page';
 import Navbar from './components/navbar.component';
+import MapPage from './pages/map.page.jsx';
 import {CollapsibleTable} from './components/table.component.jsx';
 import {Unauthenticated} from './login/unauthenticated.jsx';
 import {TeamList} from './components/teams-management.page.jsx';
@@ -37,6 +38,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Navbar />}>
             <Route index element={<HomePage />} />
+            <Route path='/map' element={<MapPage />} />
             <Route path='/signin' element={<Unauthenticated />} />
             <Route path='/rank' element={<CollapsibleTable />} />
             <Route path='/team' element={<TeamList/>}/>
@@ -46,7 +48,6 @@ function App() {
           </Route>
         </Routes>
     </UserContext.Provider>
-    
   )
 }
 

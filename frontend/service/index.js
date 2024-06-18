@@ -21,8 +21,8 @@ app.use(express.json());
 // Use the cookie parser middleware for tracking authentication tokens
 app.use(cookieParser());
 
-app.use(express.static('frontend'));
-//app.use(express.static('public'));
+// app.use(express.static('frontend'));
+app.use(express.static('public'));
 
 app.use(cors());
 
@@ -35,22 +35,6 @@ app.use(`/api`, apiRouter);
 app.use(function (err, req, res, next) {
     res.status(500).send({ type: err.name, message: err.message });
   });
-
-//http://api.football-data.org/v4/competitions/PL/standings 프리미어리그 순서 가져오는 api endpoint
-
-// apiRouter.post('/auth/create', async (req, res) => {
-//     if (await DB.getUser(req.body.email)) {
-//       res.status(409).send({ msg: 'Existing user' });
-//     } else {
-//         attendances = await DB.initialClubAttds(req.body.club, attendances);
-//         const user = await DB.createUser(req.body.email, req.body.password, req.body.name, req.body.club);
-//         attendances = await addUserToAttds(req.body.email, attendances);
-//         // Set the cookie
-//         setAuthCookie(res, user.token);
-  
-//         res.send({ name: req.body.name, club: req.body.club });
-//     }
-// });
 
 apiRouter.post('/auth/login', async (req, res) => {
     const user = await DB.getAdmin(req.body.id);
@@ -70,15 +54,21 @@ apiRouter.post('/auth/login', async (req, res) => {
 });
 
   // DeleteAuth token if stored in cookie
-apiRouter.delete('/auth/logout', async (_req, res) => {
-    authToken = req.cookies[authCookieName];
-    const user = await DB.deleteUserToken(authToken);
-    res.clearCookie(authCookieName);
-    if (user) {
-        res.status(400).send({ msg: 'Failed to remove token' });
+apiRouter.delete('/auth/logout', async (req, res) => {
+    const authToken = req.cookies[authCookieName];
+    try {
+        const tokenRemoved = await DB.deleteUserToken(authToken);
+        if (tokenRemoved) {
+            res.clearCookie(authCookieName);
+            userID = null;
+            res.status(204).end();
+        } else {
+            res.status(400).send({ msg: 'Failed to remove token' });
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        res.status(400).send({ msg: '로그아웃 중 오류가 발생했습니다.' });
     }
-    userID = null;
-    res.status(204).end();
 });
 
 apiRouter.get('/get-scores', async (req, res) => {
@@ -172,6 +162,9 @@ secureApiRouter.put('/update-score-by-activity', async (req, res) => {
     try {
         const { activityId, teamName, newScore } = req.body;
         const updatedScores = await DB.updateScoresByActivity(activityId, teamName, newScore);
+        if (newScore > 15) {
+            res.status(500).send({ msg: 'Failed to update score' });
+        }
         authToken = req.cookies[authCookieName];
         res.status(200).send({updatedScores: updatedScores , access_token: authToken , id: 'admin'});
     } catch (err) {
@@ -295,7 +288,7 @@ secureApiRouter.post('/attendances', async (req, res) => {
 });
 
 app.use((_req, res) => {
-    res.sendFile('index.html', { root: path.join(__dirname, '../frontend') });
+    res.sendFile('index.html', { root: path.join(__dirname, 'public') });
   });
 
 const httpService = app.listen(port, () => {
